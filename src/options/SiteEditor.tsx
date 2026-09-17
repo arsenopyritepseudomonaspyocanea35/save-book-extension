@@ -1,4 +1,6 @@
 import { For, Show, createSignal, onCleanup, type Component } from 'solid-js';
+import { Button } from '../ui/button/button';
+import { Field } from '../ui/field/field';
 import { ItemRow } from './ItemRow';
 import { parsePattern } from '../shared/pattern';
 import { itemTypeList } from '../shared/itemTypes';
@@ -45,8 +47,7 @@ export const SiteEditor: Component<SiteEditorProps> = (props) => {
     <>
       <div class="panel">
         <div class="fields">
-          <label class="field">
-            <span>Domain</span>
+          <Field label="Domain">
             <div class="field-row">
               <input
                 type="text"
@@ -55,26 +56,23 @@ export const SiteEditor: Component<SiteEditorProps> = (props) => {
                 value={props.patternDraft}
                 onInput={(event) => props.onPatternDraft(event.currentTarget.value)}
               />
-              <button
-                class="btn"
-                type="button"
+              <Button
                 disabled={!canApply()}
                 title="Ask Chrome for access to the new domain"
                 onClick={() => props.onApplyPattern()}
               >
                 Apply
-              </button>
+              </Button>
             </div>
-          </label>
-          <label class="field">
-            <span>Label</span>
+          </Field>
+          <Field label="Label">
             <input
               type="text"
               placeholder="Optional, shown in the card"
               value={props.site.label}
               onInput={(event) => props.onLabel(event.currentTarget.value)}
             />
-          </label>
+          </Field>
         </div>
 
         <label class="switch">
@@ -101,9 +99,9 @@ export const SiteEditor: Component<SiteEditorProps> = (props) => {
           <div class="kinds">
             <For each={itemTypeList}>
               {(definition) => (
-                <button class="btn ghost" type="button" onClick={() => props.onAddItem(definition.kind)}>
+                <Button variant="ghost" onClick={() => props.onAddItem(definition.kind)}>
                   + {definition.label}
-                </button>
+                </Button>
               )}
             </For>
           </div>
@@ -129,12 +127,12 @@ export const SiteEditor: Component<SiteEditorProps> = (props) => {
         </ul>
 
         <div class="foot">
-          <button class="btn ghost" type="button" onClick={() => props.onResetCard()}>
+          <Button variant="ghost" onClick={() => props.onResetCard()}>
             Reset card position
-          </button>
-          <button class="btn danger" type="button" onClick={confirmDelete}>
+          </Button>
+          <Button variant="danger" onClick={confirmDelete}>
             {armed() ? 'Click again to delete' : 'Delete site'}
-          </button>
+          </Button>
         </div>
       </div>
     </>

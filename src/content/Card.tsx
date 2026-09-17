@@ -1,5 +1,6 @@
 import { For, Show, createEffect, createSignal, onCleanup, onMount, type Component } from 'solid-js';
-import { ChevronIcon, CloseIcon, EyeIcon, EyeOffIcon, GripIcon } from '../ui/icons';
+import { IconButton } from '../ui/icon-button/icon-button';
+import { ChevronIcon, CloseIcon, EyeIcon, EyeOffIcon, GripIcon } from '../ui/icons/icons';
 import { itemTypes } from '../shared/itemTypes';
 import type { Item, Site, SiteUI } from '../shared/schema';
 
@@ -52,17 +53,15 @@ const Row: Component<{ item: Item; copy: (item: Item) => Promise<boolean> }> = (
           {copied() ? 'Copied' : shown() || '—'}
         </span>
         <Show when={definition().secret}>
-          <button
-            class="peek"
-            type="button"
+          <IconButton
             title={revealed() ? 'Hide' : 'Reveal'}
-            on:click={(event) => {
+            onClick={(event) => {
               event.stopPropagation();
               setRevealed((value) => !value);
             }}
           >
             {revealed() ? <EyeOffIcon /> : <EyeIcon />}
-          </button>
+          </IconButton>
         </Show>
       </div>
     </li>
@@ -158,7 +157,7 @@ export const Card: Component<CardProps> = (props) => {
 
   return (
     <div
-      class="card"
+      class="card ui-tokens"
       classList={{ collapsed: props.site.ui.collapsed }}
       on:click={(event) => event.stopPropagation()}
       on:contextmenu={(event) => event.stopPropagation()}
@@ -169,24 +168,12 @@ export const Card: Component<CardProps> = (props) => {
         </span>
         <span class="title">{props.site.label || props.site.pattern}</span>
         <span class="acts">
-          <button
-            class="btn"
-            type="button"
-            title="Collapse"
-            aria-label="Collapse"
-            on:click={() => props.onPatchUi({ collapsed: !props.site.ui.collapsed })}
-          >
+          <IconButton title="Collapse" onClick={() => props.onPatchUi({ collapsed: !props.site.ui.collapsed })}>
             <ChevronIcon />
-          </button>
-          <button
-            class="btn"
-            type="button"
-            title="Hide card"
-            aria-label="Hide card"
-            on:click={() => props.onPatchUi({ hidden: true })}
-          >
+          </IconButton>
+          <IconButton title="Hide card" onClick={() => props.onPatchUi({ hidden: true })}>
             <CloseIcon />
-          </button>
+          </IconButton>
         </span>
       </div>
       <div class="sep" />

@@ -1,5 +1,6 @@
 import { For, Show, createSignal, type Component } from 'solid-js';
-import { EyeIcon, EyeOffIcon, XIcon } from '../ui/icons';
+import { IconButton } from '../ui/icon-button/icon-button';
+import { EyeIcon, EyeOffIcon, XIcon } from '../ui/icons/icons';
 import { isItemKind, itemTypeList, itemTypes } from '../shared/itemTypes';
 import type { Item, ItemKind } from '../shared/schema';
 
@@ -48,20 +49,15 @@ export const ItemRow: Component<ItemRowProps> = (props) => {
           onInput={(event) => props.onValue(event.currentTarget.value)}
         />
         <Show when={definition().secret}>
-          <button
-            class="btn icon plain"
-            type="button"
-            title="Show / hide"
-            onClick={() => setRevealed((value) => !value)}
-          >
+          <IconButton title="Show / hide" onClick={() => setRevealed((value) => !value)}>
             {revealed() ? <EyeOffIcon /> : <EyeIcon />}
-          </button>
+          </IconButton>
         </Show>
       </div>
 
-      <button class="btn icon" type="button" title="Remove item" onClick={() => props.onRemove()}>
+      <IconButton title="Remove item" danger onClick={() => props.onRemove()}>
         <XIcon />
-      </button>
+      </IconButton>
     </li>
   );
 };

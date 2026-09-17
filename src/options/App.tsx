@@ -1,5 +1,6 @@
 import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { createStore, unwrap } from 'solid-js/store';
+import { Button } from '../ui/button/button';
 import { SiteEditor } from './SiteEditor';
 import { SiteList } from './SiteList';
 import { originsFor, parsePattern } from '../shared/pattern';
@@ -235,9 +236,9 @@ export function App() {
               value={newPattern()}
               onInput={(event) => setNewPattern(event.currentTarget.value)}
             />
-            <button class="btn primary" type="submit">
+            <Button variant="primary" type="submit">
               Add
-            </button>
+            </Button>
           </form>
 
           <p class="note">

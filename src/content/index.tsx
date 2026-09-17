@@ -47,7 +47,7 @@ function createHost(): { host: HTMLElement; shadow: ShadowRoot } {
   const host = document.createElement('div');
   host.id = HOST_ID;
   host.style.cssText =
-    'all:initial;position:fixed!important;top:0!important;left:0!important;margin:0!important;' +
+    'all:initial!important;position:fixed!important;top:0!important;left:0!important;margin:0!important;' +
     'padding:0!important;border:0!important;display:block!important;width:auto!important;' +
     'height:auto!important;max-width:none!important;z-index:2147483647!important;';
   const shadow = host.attachShadow({ mode: 'open' });
