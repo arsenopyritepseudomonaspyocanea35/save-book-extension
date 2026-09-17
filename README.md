@@ -61,18 +61,20 @@ src/
 store/          Chrome Web Store listing assets (icon, screenshots, promo tiles)
 ```
 
-## Releasing
+## Releasing and building
 
-Releases are cut manually from the **Release** workflow — **Actions → Release → Run workflow**:
+The **Release** workflow — **Actions → Release → Run workflow** — has three modes:
 
-1. Bump `version` in `public/manifest.json` and commit it.
-2. Run the workflow. It typechecks, then refuses to continue unless the version is
-   `MAJOR.MINOR.PATCH` and strictly higher than every existing `v*` tag, so a version can never be
-   reused or moved backwards.
-3. It builds, attaches `save-book-<version>.zip` to a new release tagged `v<version>`, and that same
-   zip is what you upload to the Chrome Web Store dashboard.
+- **build** *(default)* — typechecks, builds, and uploads `save-book-<version>.zip` as a workflow
+  artifact you can download from the run. No version gate, no tag, no release.
+- **dry-run** — everything a release does, including the version gate, but publishes nothing.
+- **release** — typechecks, requires a `MAJOR.MINOR.PATCH` version that is strictly higher than every
+  existing `v*` tag, builds, and attaches `save-book-<version>.zip` to a new release tagged
+  `v<version>`.
 
-Set **dry_run** to typecheck, validate and build without creating the tag or release.
+To cut a release: bump `version` in `public/manifest.json`, commit and push, then run the workflow in
+**release** mode. That same zip is what you upload to the Chrome Web Store dashboard — the store
+requires each upload to carry a higher version than the last one published.
 
 ## Privacy
 

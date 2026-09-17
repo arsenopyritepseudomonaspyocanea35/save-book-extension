@@ -3,10 +3,14 @@ name: Release
 on:
   workflow_dispatch:
     inputs:
-      dry_run:
-        description: 'Validate and build only - do not create the tag or release'
-        type: boolean
-        default: false
+      mode:
+        description: 'build = verify + upload zip artifact | dry-run = also check the version | release = also publish'
+        type: choice
+        options:
+          - build
+          - dry-run
+          - release
+        default: build
 
 permissions:
   contents: write
@@ -16,18 +20,18 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  release:
+  build-and-release:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version: '1'
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -36,6 +40,7 @@ jobs:
         run: bun run typecheck
 
       - name: Check the version is new and higher than every previous release
+        if: inputs.mode != 'build'
         id: version
         run: |
           set -euo pipefail
@@ -75,8 +80,16 @@ jobs:
           echo "zip=$ZIP" >> "$GITHUB_OUTPUT"
           echo "zip to publish: $ZIP"
 
+      - name: Upload the zip as a workflow artifact
+        if: inputs.mode != 'release'
+        uses: actions/upload-artifact@v7
+        with:
+          name: save-book-build
+          path: ${{ steps.package.outputs.zip }}
+          if-no-files-found: error
+
       - name: Create the tag and publish the release
-        if: ${{ !inputs.dry_run }}
+        if: inputs.mode == 'release'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
