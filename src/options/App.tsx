@@ -22,6 +22,8 @@ export function App() {
   const [patternDraft, setPatternDraft] = createSignal('');
   const [newPattern, setNewPattern] = createSignal('');
   const [toast, setToast] = createSignal<{ text: string; kind: ToastKind } | null>(null);
+  /** Sites whose reset this page is about to write, so the merge below keeps it. */
+  const touchedUi = new Set<string>();
   let saveTimer = 0;
   let toastTimer = 0;
 
@@ -36,24 +38,38 @@ export function App() {
     toastTimer = setTimeout(() => setToast(null), 4200);
   };
 
-  const persist = () => {
+  /*
+   * Writes replace the whole store, so pick up the field another context owns
+   * before writing: cards persist their own position/hidden/collapsed, and
+   * without this merge any settings edit would snap every open card back to
+   * where it sat when this page loaded.
+   */
+  const flushWrite = async () => {
     clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => void writeStore(structuredClone(unwrap(store))), 300);
+    saveTimer = 0;
+    const next = structuredClone(unwrap(store));
+    const stored = new Map((await readStore()).sites.map((site) => [site.id, site]));
+    for (const site of next.sites) {
+      if (touchedUi.has(site.id)) continue;
+      const current = stored.get(site.id);
+      if (current) site.ui = current.ui;
+    }
+    await writeStore(next);
+    touchedUi.clear();
   };
 
-  const persistNow = () => {
+  const persist = () => {
     clearTimeout(saveTimer);
-    return writeStore(structuredClone(unwrap(store)));
+    saveTimer = setTimeout(() => void flushWrite(), 300);
   };
+
+  const persistNow = () => flushWrite();
 
   const indexOfSite = (id: string) => store.sites.findIndex((site) => site.id === id);
   const selectedSite = () => store.sites.find((site) => site.id === selectedId());
 
   // Follow the stored pattern: switching sites, or applying a change, resets the field.
   createEffect(() => setPatternDraft(selectedSite()?.pattern ?? ''));
-
-  const requestOrigins = (origins: string[]) =>
-    chrome.permissions.request({ origins }).catch(() => false);
 
   /** Hand back host permissions no remaining site needs. */
   const dropOrigins = async (candidates: string[]) => {
@@ -76,7 +92,8 @@ export function App() {
       return;
     }
     const origins = originsFor(pattern);
-    if (!(await requestOrigins(origins))) {
+    // Chrome rejects on error; treat that the same as a refusal.
+    if (!(await chrome.permissions.request({ origins }).catch(() => false))) {
       notify(`Chrome access to ${pattern} was not granted`, 'error');
       return;
     }
@@ -101,7 +118,7 @@ export function App() {
       setPatternDraft(site.pattern);
       return;
     }
-    if (!(await requestOrigins(originsFor(pattern)))) {
+    if (!(await chrome.permissions.request({ origins: originsFor(pattern) }).catch(() => false))) {
       notify(`Chrome access to ${pattern} was not granted`, 'error');
       setPatternDraft(site.pattern);
       return;
@@ -136,6 +153,7 @@ export function App() {
   const resetCard = (site: Site) => {
     const index = indexOfSite(site.id);
     if (index < 0) return;
+    touchedUi.add(site.id);
     setStore('sites', index, 'ui', { x: null, y: null, collapsed: false, hidden: false });
     void persistNow();
     notify('The card will show up again, top right.');

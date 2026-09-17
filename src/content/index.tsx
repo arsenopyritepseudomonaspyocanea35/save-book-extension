@@ -82,7 +82,9 @@ async function boot(): Promise<void> {
   let unsubscribe: (() => void) | undefined;
 
   const patchUi = (patch: Partial<SiteUI>) => {
-    void patchSite(initial.id, (current) => Object.assign(current.ui, patch)).catch(() => {});
+    const current = site();
+    if (!current) return;
+    void patchSite(current.id, (target) => Object.assign(target.ui, patch)).catch(() => {});
   };
 
   function onMessage(
@@ -131,8 +133,10 @@ async function boot(): Promise<void> {
   );
 
   unsubscribe = onStoreChanged((changed) => {
-    const next = changed.sites.find((candidate) => candidate.id === initial.id);
-    if (!next || !next.enabled) {
+    // Re-match instead of looking the boot site up by id: editing a pattern can
+    // move that site off this host, or hand the host to a more specific one.
+    const next = findSite(changed, location.hostname);
+    if (!next) {
       unmount();
       return;
     }

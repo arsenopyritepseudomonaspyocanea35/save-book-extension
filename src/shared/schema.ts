@@ -37,7 +37,7 @@ const SiteSchema = v.object({
   enabled: v.fallback(v.boolean(), true),
   origins: v.fallback(v.array(v.string()), []),
   items: v.fallback(v.array(v.unknown()), []),
-  ui: v.fallback(SiteUiSchema, DEFAULT_UI),
+  ui: v.fallback(SiteUiSchema, () => ({ ...DEFAULT_UI })),
 });
 
 const StoreShapeSchema = v.object({

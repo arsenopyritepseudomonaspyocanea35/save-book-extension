@@ -98,12 +98,21 @@ async function syncRegistrations(): Promise<void> {
 }
 
 let syncTimer = 0;
+let syncChain: Promise<void> = Promise.resolve();
+
+/**
+ * Serialized: an in-flight plan must never register a site a newer sync already
+ * dropped (disabling a site mid-plan used to resurrect its registration).
+ */
+function queueSync(): void {
+  syncChain = syncChain.then(syncRegistrations).catch(() => {});
+}
 
 function scheduleSync(): void {
   clearTimeout(syncTimer);
   syncTimer = setTimeout(() => {
     syncTimer = 0;
-    void syncRegistrations().catch(() => {});
+    queueSync();
   }, 150);
 }
 
@@ -115,13 +124,11 @@ chrome.permissions.onAdded.addListener(scheduleSync);
 chrome.permissions.onRemoved.addListener(scheduleSync);
 
 chrome.runtime.onInstalled.addListener((details) => {
-  void syncRegistrations().catch(() => {});
+  queueSync();
   if (details.reason === 'install') chrome.runtime.openOptionsPage();
 });
 
-chrome.runtime.onStartup.addListener(() => {
-  void syncRegistrations().catch(() => {});
-});
+chrome.runtime.onStartup.addListener(queueSync);
 
 chrome.action.onClicked.addListener(async (tab) => {
   const toggle: BackgroundToCard = { type: 'sb:toggle' };
@@ -152,4 +159,4 @@ chrome.runtime.onMessage.addListener((message: unknown) => {
   void chrome.runtime.openOptionsPage();
 });
 
-void syncRegistrations().catch(() => {});
+queueSync();
