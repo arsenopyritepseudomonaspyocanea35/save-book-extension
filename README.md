@@ -14,19 +14,20 @@ the page. A small, draggable card shows your saved items on the sites you choose
 
 ## Install for testing
 
-Build it, then load the output as an unpacked extension:
+No toolchain needed: download `save-book-<version>.zip` from the
+[latest release](../../releases/latest), unzip it, then open `chrome://extensions`, enable
+**Developer mode**, click **Load unpacked**, and select the unzipped folder — the one that directly
+contains `manifest.json`. It has to be unzipped first: Chrome cannot load an extension from a zip.
+
+To build it yourself instead:
 
 ```sh
 bun install
 bun run build
 ```
 
-Open `chrome://extensions`, enable **Developer mode**, click **Load unpacked**, and select the
-`dist/` folder.
-
-To hand someone a folder they can load without a toolchain, run `bun run package` and send them
-`release/save-book-<version>.zip`. It has to be unzipped first — Chrome cannot load an extension
-from a zip file.
+Then load the `dist/` folder the same way. `bun run package` builds and produces
+`release/save-book-<version>.zip` locally.
 
 Then open the extension's options page, add a domain, and approve Chrome's prompt for that host.
 
@@ -59,6 +60,19 @@ src/
   ui/           shared components and design tokens
 store/          Chrome Web Store listing assets (icon, screenshots, promo tiles)
 ```
+
+## Releasing
+
+Releases are cut manually from the **Release** workflow — **Actions → Release → Run workflow**:
+
+1. Bump `version` in `public/manifest.json` and commit it.
+2. Run the workflow. It typechecks, then refuses to continue unless the version is
+   `MAJOR.MINOR.PATCH` and strictly higher than every existing `v*` tag, so a version can never be
+   reused or moved backwards.
+3. It builds, attaches `save-book-<version>.zip` to a new release tagged `v<version>`, and that same
+   zip is what you upload to the Chrome Web Store dashboard.
+
+Set **dry_run** to typecheck, validate and build without creating the tag or release.
 
 ## Privacy
 
