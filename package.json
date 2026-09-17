@@ -6,7 +6,8 @@
   "scripts": {
     "build": "vite build -c vite.content.config.ts && vite build -c vite.app.config.ts",
     "watch": "vite build -c vite.content.config.ts --watch",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "package": "bun run build && bun scripts/package.mjs"
   },
   "dependencies": {
     "solid-js": "^1.9.3",
