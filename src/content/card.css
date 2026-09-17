@@ -1,0 +1,193 @@
+:host {
+  all: initial;
+}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+.card {
+  --bg: rgba(255, 255, 255, 0.88);
+  --fg: #14161a;
+  --muted: #6b7280;
+  --line: rgba(16, 24, 40, 0.1);
+  --hover: rgba(16, 24, 40, 0.05);
+  --accent: #4f46e5;
+  width: min(272px, calc(100vw - 24px));
+  color: var(--fg);
+  background: var(--bg);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 10px 30px -8px rgba(16, 24, 40, 0.28);
+  font: 400 13px/1.45 -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+@media (prefers-color-scheme: dark) {
+  .card {
+    --bg: rgba(20, 22, 26, 0.88);
+    --fg: #e9eaec;
+    --muted: #9aa0a6;
+    --line: rgba(255, 255, 255, 0.1);
+    --hover: rgba(255, 255, 255, 0.07);
+    --accent: #a5b4fc;
+  }
+}
+.head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 7px 7px 9px;
+  cursor: grab;
+  touch-action: none;
+}
+.head:active {
+  cursor: grabbing;
+}
+.grip {
+  display: flex;
+  color: var(--muted);
+  opacity: 0.45;
+}
+.title {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.acts {
+  display: flex;
+  gap: 1px;
+}
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+.btn:hover {
+  background: var(--hover);
+  color: var(--fg);
+}
+.chev {
+  transition: transform 0.16s ease;
+}
+.card.collapsed .chev {
+  transform: rotate(-90deg);
+}
+.sep {
+  height: 1px;
+  background: var(--line);
+}
+.items {
+  list-style: none;
+  padding: 5px 6px 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  max-height: 44vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 7px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+.row:hover {
+  background: var(--hover);
+}
+.row:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: -1px;
+  background: var(--hover);
+}
+.lbl {
+  flex: 0 1 auto;
+  max-width: 46%;
+  color: var(--muted);
+  font-size: 11.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.val {
+  flex: 1;
+  min-width: 0;
+  text-align: right;
+  font-size: 11.5px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.row.nolabel .val {
+  text-align: left;
+  font-size: 12px;
+}
+.val.dim {
+  color: var(--muted);
+}
+.val.copied {
+  color: var(--accent);
+}
+.peek {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  border: 0;
+  border-radius: 5px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  opacity: 0.6;
+}
+.peek:hover {
+  background: var(--hover);
+  opacity: 1;
+}
+.empty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 7px 7px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.link {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--accent);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+}
+.link:hover {
+  text-decoration: underline;
+}
+.card.collapsed .sep,
+.card.collapsed .items {
+  display: none;
+}

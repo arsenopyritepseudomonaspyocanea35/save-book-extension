@@ -1,0 +1,21 @@
+{
+  "name": "save-book-extension",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build -c vite.content.config.ts && vite build -c vite.app.config.ts",
+    "watch": "vite build -c vite.content.config.ts --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "solid-js": "^1.9.3",
+    "valibot": "^1.5.0"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.287",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7",
+    "vite-plugin-solid": "^2.11.0"
+  }
+}
