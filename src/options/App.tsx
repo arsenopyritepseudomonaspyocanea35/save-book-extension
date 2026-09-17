@@ -22,7 +22,6 @@ export function App() {
   const [patternDraft, setPatternDraft] = createSignal('');
   const [newPattern, setNewPattern] = createSignal('');
   const [toast, setToast] = createSignal<{ text: string; kind: ToastKind } | null>(null);
-  /** Sites whose reset this page is about to write, so the merge below keeps it. */
   const touchedUi = new Set<string>();
   let saveTimer = 0;
   let toastTimer = 0;
@@ -38,12 +37,6 @@ export function App() {
     toastTimer = setTimeout(() => setToast(null), 4200);
   };
 
-  /*
-   * Writes replace the whole store, so pick up the field another context owns
-   * before writing: cards persist their own position/hidden/collapsed, and
-   * without this merge any settings edit would snap every open card back to
-   * where it sat when this page loaded.
-   */
   const flushWrite = async () => {
     clearTimeout(saveTimer);
     saveTimer = 0;
@@ -68,10 +61,8 @@ export function App() {
   const indexOfSite = (id: string) => store.sites.findIndex((site) => site.id === id);
   const selectedSite = () => store.sites.find((site) => site.id === selectedId());
 
-  // Follow the stored pattern: switching sites, or applying a change, resets the field.
   createEffect(() => setPatternDraft(selectedSite()?.pattern ?? ''));
 
-  /** Hand back host permissions no remaining site needs. */
   const dropOrigins = async (candidates: string[]) => {
     const kept = new Set(store.sites.flatMap((site) => site.origins));
     const drop = candidates.filter((origin) => !kept.has(origin));
@@ -92,7 +83,6 @@ export function App() {
       return;
     }
     const origins = originsFor(pattern);
-    // Chrome rejects on error; treat that the same as a refusal.
     if (!(await chrome.permissions.request({ origins }).catch(() => false))) {
       notify(`Chrome access to ${pattern} was not granted`, 'error');
       return;
@@ -208,9 +198,7 @@ export function App() {
       if (!pattern) return;
       setNewPattern(pattern);
       notify(`Press Add to give Save Book access to ${pattern}.`);
-    } catch {
-      /* session storage is optional */
-    }
+    } catch {}
   });
 
   return (

@@ -6,7 +6,6 @@ import type { ItemKind, Site } from '../shared/schema';
 
 export interface SiteEditorProps {
   site: Site;
-  /** The domain field's text, owned by App so a denied change can be reverted. */
   patternDraft: string;
   onPatternDraft: (value: string) => void;
   onApplyPattern: () => void;

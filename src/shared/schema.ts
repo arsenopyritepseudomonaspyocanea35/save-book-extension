@@ -4,16 +4,10 @@ import { parsePattern } from './pattern';
 export const STORAGE_KEY = 'saveBook';
 export const SCHEMA_VERSION = 1;
 
-/** Every kind of item a site can hold; `itemTypes` must define all of them. */
 export const ITEM_KINDS = ['text', 'secret'] as const;
 export const ItemKindSchema = v.picklist(ITEM_KINDS);
 export type ItemKind = v.InferOutput<typeof ItemKindSchema>;
 
-/*
- * The persisted blob outlives the code that wrote it, so everything crossing the
- * storage boundary is parsed rather than trusted. Leaves declare a fallback: one
- * corrupt field must never cost the user a whole site.
- */
 const ItemSchema = v.object({
   id: v.fallback(v.pipe(v.string(), v.minLength(1)), () => crypto.randomUUID()),
   type: v.fallback(ItemKindSchema, 'text'),
@@ -53,7 +47,6 @@ export interface Site {
   pattern: string;
   label: string;
   enabled: boolean;
-  /** Host permissions granted for this site, so they can be revoked cleanly. */
   origins: string[];
   items: Item[];
   ui: SiteUI;
@@ -75,7 +68,6 @@ function parseSite(raw: unknown): Site | undefined {
   return { ...parsed.output, pattern: parsePattern(parsed.output.pattern), items };
 }
 
-/** Total: any value at all yields a usable store, never a throw. */
 export function parseStore(raw: unknown): Store {
   const shape = v.safeParse(StoreShapeSchema, raw);
   if (!shape.success) return emptyStore();

@@ -9,20 +9,12 @@ const COPY_MS = 1000;
 
 export interface CardProps {
   site: Site;
-  /** The fixed-position host element the card positions and measures itself through. */
   host: HTMLElement;
   onPatchUi: (patch: Partial<SiteUI>) => void;
   onOpenOptions: () => void;
-  /** Resolves true when the value actually reached the clipboard. */
   copy: (item: Item) => Promise<boolean>;
 }
 
-/*
- * Every click handler below is `on:`-prefixed (a direct listener) rather than
- * Solid's delegated `onClick`. Delegated handlers live on the document, and the
- * card stops click propagation in its shadow root so the host page never sees
- * card interaction — that would cut the delegated path off entirely.
- */
 const Row: Component<{ item: Item; copy: (item: Item) => Promise<boolean> }> = (props) => {
   const definition = () => itemTypes[props.item.type];
   const [revealed, setRevealed] = createSignal(false);
@@ -78,9 +70,6 @@ const Row: Component<{ item: Item; copy: (item: Item) => Promise<boolean> }> = (
 };
 
 export const Card: Component<CardProps> = (props) => {
-  // Not a signal: the position is applied imperatively to the host, so nothing
-  // renders from it — and keeping it out of the reactive graph is what stops the
-  // storage-tracking effect below from retriggering itself.
   let position = { x: 0, y: 0 };
   let dragging = false;
   let endDrag: (() => void) | undefined;
@@ -106,8 +95,6 @@ export const Card: Component<CardProps> = (props) => {
     apply(x ?? window.innerWidth, y ?? GUTTER);
   };
 
-  // Runs on mount to place the card, then follows the stored position: the
-  // options page can reset it and another tab can drag it.
   createEffect(() => {
     const { hidden, x, y } = props.site.ui;
     props.host.style.setProperty('display', hidden ? 'none' : 'block', 'important');

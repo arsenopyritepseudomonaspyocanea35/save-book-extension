@@ -43,7 +43,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ------------------------------------------------------------------ shell */
 .app {
   display: grid;
   grid-template-columns: 292px minmax(0, 1fr);
@@ -86,7 +85,6 @@ body {
   color: var(--accent);
 }
 
-/* ------------------------------------------------------------------- form */
 input[type='text'],
 input[type='password'],
 select {
@@ -144,7 +142,6 @@ code {
   font-size: 11.5px;
 }
 
-/* ----------------------------------------------------------- site sidebar */
 .sites {
   list-style: none;
   display: flex;
@@ -217,7 +214,6 @@ code {
   opacity: 0.5;
 }
 
-/* ----------------------------------------------------------------- panels */
 .panel {
   padding: 20px 22px;
   background: var(--panel);
@@ -316,7 +312,6 @@ code {
   font-size: 13.5px;
 }
 
-/* ------------------------------------------------------------------ items */
 .section-head {
   display: flex;
   align-items: center;
@@ -368,7 +363,6 @@ code {
   font-size: 13px;
 }
 
-/* ---------------------------------------------------------------- buttons */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -459,7 +453,6 @@ code {
   border-top: 1px solid var(--line);
 }
 
-/* -------------------------------------------------------------- placeholder */
 .placeholder {
   max-width: 520px;
   padding: 40px 0;
@@ -478,7 +471,6 @@ code {
   font-size: 13.5px;
 }
 
-/* ------------------------------------------------------------------ toast */
 .toast {
   position: fixed;
   left: 50%;

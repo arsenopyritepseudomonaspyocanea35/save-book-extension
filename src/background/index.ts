@@ -3,14 +3,7 @@ import { originsFor } from '../shared/pattern';
 import { STORAGE_KEY } from '../shared/schema';
 import { readStore } from '../shared/store';
 
-/*
- * The service worker owns exactly one thing: keeping Chrome's registered content
- * scripts in sync with the sites the user configured, so the card only ever runs
- * where the user granted access.
- */
-
 const SCRIPT_PREFIX = 'savebook:';
-/** The bundled card script — a single classic script, not a module. */
 const CARD_FILES = ['content.js'];
 
 async function desiredScripts(): Promise<Map<string, chrome.scripting.RegisteredContentScript>> {
@@ -20,7 +13,6 @@ async function desiredScripts(): Promise<Map<string, chrome.scripting.Registered
     if (!site.enabled) continue;
     const matches = originsFor(site.pattern);
     if (!matches.length) continue;
-    // Never register a script for a host the user has not actually granted.
     if (!(await chrome.permissions.contains({ origins: matches }))) continue;
     const id = `${SCRIPT_PREFIX}${site.id}`;
     scripts.set(id, {
@@ -35,7 +27,6 @@ async function desiredScripts(): Promise<Map<string, chrome.scripting.Registered
   return scripts;
 }
 
-/** A newly registered site should show up without making the user reload. */
 async function injectOpenTabs(matches: string[]): Promise<void> {
   let tabs: chrome.tabs.Tab[] = [];
   try {
@@ -47,9 +38,7 @@ async function injectOpenTabs(matches: string[]): Promise<void> {
     if (tab.id === undefined) continue;
     try {
       await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: CARD_FILES });
-    } catch {
-      /* restricted page, or the tab went away */
-    }
+    } catch {}
   }
 }
 
@@ -89,9 +78,7 @@ async function syncRegistrations(): Promise<void> {
     if (remove.length) await chrome.scripting.unregisterContentScripts({ ids: remove });
     if (update.length) await chrome.scripting.updateContentScripts(update);
     if (add.length) await chrome.scripting.registerContentScripts(add);
-  } catch {
-    /* host permission missing or revoked — nothing to run on */
-  }
+  } catch {}
 
   if (!changed.length) return;
   await injectOpenTabs(changed.flatMap((script) => script.matches ?? []));
@@ -100,10 +87,6 @@ async function syncRegistrations(): Promise<void> {
 let syncTimer = 0;
 let syncChain: Promise<void> = Promise.resolve();
 
-/**
- * Serialized: an in-flight plan must never register a site a newer sync already
- * dropped (disabling a site mid-plan used to resurrect its registration).
- */
 function queueSync(): void {
   syncChain = syncChain.then(syncRegistrations).catch(() => {});
 }
@@ -136,9 +119,7 @@ chrome.action.onClicked.addListener(async (tab) => {
     try {
       await chrome.tabs.sendMessage(tab.id, toggle);
       return;
-    } catch {
-      /* no card in this tab */
-    }
+    } catch {}
   }
   try {
     if (tab.url) {
@@ -147,9 +128,7 @@ chrome.action.onClicked.addListener(async (tab) => {
         await chrome.storage.session.set({ pendingPattern: url.hostname });
       }
     }
-  } catch {
-    /* tab.url is often unavailable without host access */
-  }
+  } catch {}
   await chrome.runtime.openOptionsPage();
 });
 

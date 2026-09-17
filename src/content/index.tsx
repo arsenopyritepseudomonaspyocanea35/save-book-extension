@@ -9,9 +9,6 @@ import type { Item, Site, SiteUI } from '../shared/schema';
 import { onStoreChanged, patchSite, readStore } from '../shared/store';
 
 declare global {
-  // The card can be injected twice within the same tick (the registered script
-  // plus a manual injection from the service worker); the isolated world keeps
-  // one boot promise per frame.
   var __savebookBoot: Promise<void> | null | undefined;
 }
 
@@ -23,9 +20,7 @@ async function copyText(text: string): Promise<boolean> {
       await navigator.clipboard.writeText(text);
       return true;
     }
-  } catch {
-    /* fall through to the legacy path on http pages */
-  }
+  } catch {}
   try {
     const area = document.createElement('textarea');
     area.value = text;
@@ -48,11 +43,6 @@ function isToggleMessage(message: unknown): message is BackgroundToCard {
   );
 }
 
-/**
- * A fixed-position wrapper in the page, with everything inside a shadow root so
- * the host page's CSS cannot reach the card. `!important` inline styles survive
- * whatever the page declares for `div`.
- */
 function createHost(): { host: HTMLElement; shadow: ShadowRoot } {
   const host = document.createElement('div');
   host.id = HOST_ID;
@@ -74,7 +64,7 @@ async function boot(): Promise<void> {
   const store = await readStore();
   const initial = findSite(store, location.hostname);
   if (!initial) return;
-  if (document.getElementById(HOST_ID)) return; // a parallel injection won
+  if (document.getElementById(HOST_ID)) return;
 
   const { host, shadow } = createHost();
   const [site, setSite] = createSignal<Site | undefined>(initial);
@@ -93,8 +83,6 @@ async function boot(): Promise<void> {
     sendResponse: (response: unknown) => void,
   ) {
     if (!isToggleMessage(message)) return;
-    // Always answer: the toolbar click awaits this and would otherwise look
-    // like a dead tab and fall through to opening the options page.
     patchUi({ hidden: !(site()?.ui.hidden ?? false) });
     sendResponse({ ok: true });
   }
@@ -104,7 +92,6 @@ async function boot(): Promise<void> {
     unsubscribe?.();
     chrome.runtime.onMessage.removeListener(onMessage);
     host.remove();
-    // Let a later injection boot again now that this instance is gone.
     globalThis.__savebookBoot = null;
   }
 
@@ -133,8 +120,6 @@ async function boot(): Promise<void> {
   );
 
   unsubscribe = onStoreChanged((changed) => {
-    // Re-match instead of looking the boot site up by id: editing a pattern can
-    // move that site off this host, or hand the host to a more specific one.
     const next = findSite(changed, location.hostname);
     if (!next) {
       unmount();
