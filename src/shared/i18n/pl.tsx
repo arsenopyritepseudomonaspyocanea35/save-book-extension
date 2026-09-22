@@ -4,8 +4,6 @@ import type { Dictionary } from './en';
 
 const plural = new Intl.PluralRules('pl');
 
-// Polish counts carry case as well as number: "3 witryny" but "Usunięto 3 witryny",
-// "na 3 witrynach". Every form a sentence needs gets its own helper.
 const pick = (count: number, one: string, few: string, many: string): string => {
   switch (plural.select(count)) {
     case 'one':
@@ -24,7 +22,13 @@ const onSites = (count: number) => pick(count, 'witrynie', 'witrynach', 'witryna
 const otherSites = (count: number) =>
   pick(count, 'innej witrynie', 'innych witrynach', 'innych witrynach');
 
-const LANGUAGE_NAME: Record<Locale, string> = { en: 'angielski', pl: 'polski' };
+const LANGUAGE_NAME: Record<Locale, string> = {
+  en: 'angielski',
+  pl: 'polski',
+  es: 'hiszpański',
+  fr: 'francuski',
+  de: 'niemiecki',
+};
 
 export const pl: Dictionary = {
   'common.system': 'System',

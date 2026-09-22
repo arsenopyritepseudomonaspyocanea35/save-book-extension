@@ -13,7 +13,7 @@ export const THEMES = ['system', 'light', 'dark'] as const;
 export const ThemeSchema = v.picklist(THEMES);
 export type Theme = v.InferOutput<typeof ThemeSchema>;
 
-export const LOCALES = ['en', 'pl'] as const;
+export const LOCALES = ['en', 'pl', 'es', 'fr', 'de'] as const;
 export type Locale = (typeof LOCALES)[number];
 
 export const LANGUAGES = ['system', ...LOCALES] as const;

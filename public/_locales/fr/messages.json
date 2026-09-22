@@ -1,0 +1,10 @@
+{
+  "extDescription": {
+    "message": "Gardez les identifiants, les chiffres et les notes dont vous avez besoin juste à côté des sites où vous les utilisez.",
+    "description": "The extension's one-line description, shown by Chrome."
+  },
+  "actionTitle": {
+    "message": "Save Book — afficher ou masquer la carte sur ce site",
+    "description": "Tooltip on the toolbar button."
+  }
+}

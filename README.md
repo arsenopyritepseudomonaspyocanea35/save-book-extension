@@ -13,9 +13,9 @@ the page. A small, draggable card shows your saved items on the sites you choose
   same data — a site's items, and an item's sites; the third holds the extension's own settings.
 - **Appearance** overrides the theme for the settings page and for the card on every site — follow
   the system, or pin light or dark. **Language** follows your browser's own language out of the box —
-  English and Polish ship today — and can be pinned to either, in the settings page and on the card
-  together. **Data** clears all sites, all items, or everything, and hands back the Chrome access
-  that went with those sites.
+  English, Polish, Spanish, French and German ship today — and can be pinned to any of them, in the
+  settings page and on the card together. **Data** clears all sites, all items, or everything, and
+  hands back the Chrome access that went with those sites.
 - A card shows the items of **every site that matches the page** — its own site and any broader one,
   `*` included. So an item kept on the `*` site appears everywhere the card runs, next to whatever
   that page has of its own. Chrome access is per domain, so the `*` site needs the all-sites grant;
@@ -54,14 +54,15 @@ Then open the extension's options page, add a domain, and approve Chrome's promp
 - Items live in `chrome.storage.local` as one pool, each item carrying the sites it is shown on. A
   store written by an older version is folded into that pool on first read, one file per hop under
   `src/shared/migrations/`. There is no server and no network code.
-- Every string both surfaces render lives in `src/shared/i18n/`, as `en.tsx` and `pl.tsx` typed
-  against each other — a language missing a key, or carrying one English does not have, does not
-  compile. Sentences that carry a count or a name are dictionary functions rather than
-  concatenations, because Polish inflects both. The language setting is stored next to the theme and
-  reaches the card through the store change it already listens to. Chrome's own surfaces — the
-  toolbar tooltip and the description in `chrome://extensions` — cannot be reached from the page, so
-  they are translated in `public/_locales/` and follow the browser's UI language rather than this
-  setting; the extension's name is a brand and stays as it is.
+- Every string both surfaces render lives in `src/shared/i18n/`, one file per language (`en`, `pl`,
+  `es`, `fr`, `de`) each typed as the English dictionary — a language missing a key, or carrying one
+  English does not have, does not compile. Sentences that carry a count or a name are dictionary
+  functions rather than concatenations, because Polish inflects both and French counts zero as a
+  singular. The language setting is stored next to the theme and reaches the card through the store
+  change it already listens to. Chrome's own surfaces — the toolbar tooltip and the description in
+  `chrome://extensions` — cannot be reached from the page, so they are translated in `public/_locales/`
+  and follow the browser's UI language rather than this setting; the extension's name is a brand and
+  stays as it is.
 
 ## Development
 

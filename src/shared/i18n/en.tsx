@@ -1,11 +1,16 @@
 import type { JSX } from 'solid-js';
 import type { Locale } from '../schema';
 
-// English plurals are the count itself: one site, three sites.
 const sites = (count: number) => (count === 1 ? 'site' : 'sites');
 const items = (count: number) => (count === 1 ? 'item' : 'items');
 
-const LANGUAGE_NAME: Record<Locale, string> = { en: 'English', pl: 'Polish' };
+const LANGUAGE_NAME: Record<Locale, string> = {
+  en: 'English',
+  pl: 'Polish',
+  es: 'Spanish',
+  fr: 'French',
+  de: 'German',
+};
 
 export const en = {
   'common.system': 'System',

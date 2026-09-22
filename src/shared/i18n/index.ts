@@ -1,14 +1,23 @@
 import { translator } from '@solid-primitives/i18n';
 import { createSignal } from 'solid-js';
 import { LOCALES, type Language, type Locale } from '../schema';
+import { de } from './de';
 import { en, type Dictionary } from './en';
+import { es } from './es';
+import { fr } from './fr';
 import { pl } from './pl';
 
-const DICTIONARIES: Record<Locale, Dictionary> = { en, pl };
+const DICTIONARIES: Record<Locale, Dictionary> = { en, pl, es, fr, de };
 
 const DEFAULT_LOCALE: Locale = 'en';
 
-export const LOCALE_NAMES: Record<Locale, string> = { en: 'English', pl: 'Polski' };
+export const LOCALE_NAMES: Record<Locale, string> = {
+  en: 'English',
+  pl: 'Polski',
+  es: 'Español',
+  fr: 'Français',
+  de: 'Deutsch',
+};
 
 const [locale, setLocale] = createSignal<Locale>(DEFAULT_LOCALE);
 
