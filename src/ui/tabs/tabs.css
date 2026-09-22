@@ -37,7 +37,7 @@
   inset: auto 8px -1px 8px;
   height: 2px;
   background: var(--accent);
-  border-radius: 1px;
+  border-radius: var(--radius-sm);
 }
 
 .tab:focus-visible {
