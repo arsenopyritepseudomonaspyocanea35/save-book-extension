@@ -1,0 +1,10 @@
+{
+  "extDescription": {
+    "message": "Keep the logins, numbers and notes you need right next to the sites you need them on.",
+    "description": "The extension's one-line description, shown by Chrome."
+  },
+  "actionTitle": {
+    "message": "Save Book — toggle the card on this site",
+    "description": "Tooltip on the toolbar button."
+  }
+}

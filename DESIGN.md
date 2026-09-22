@@ -439,7 +439,8 @@ padding of 22px 26px 48px and a content cap of 860px so the form never stretches
 canvas. Both panes scroll inside a 100vh shell rather than the page scrolling.
 
 Settings is the same two panes carrying a different index: its rail lists the settings sections as
-rail rows whose mono subline is the section's own reading — the theme in force, or `4 sites · 9
+rail rows whose mono subline is the section's own reading — the theme in force, the language in
+force as its own name (`System · Polski` while it follows the browser), or `4 sites · 9
 items` — and the editor holds one panel per section, whose rows run title, note, control across
 `minmax(0, 1fr) auto`, separated by 1px hairlines rather than by gaps.
 
@@ -664,13 +665,13 @@ literal: an item's site rows reuse the rail's own title class rather than a copy
 
 ### Segmented control
 
-One control, two payloads: the item kind (Text / Password) wherever a kind is shown, and the theme
-(System / Light / Dark) in Settings. A `role="group"` of buttons on a 2px-padded `--hover` wash with
-an 8px radius. The active button is a `--raise` chip with a 6px radius, `--fg` text and a 1px soft
-lift; the inactive one is plain `--muted` text that goes `--fg` on hover. Focus is a 2px accent
-outline offset by 1px. It is a segmented control, not a toggle: every option is always visible, each
-button is `aria-pressed`, and the group takes its `aria-label` from the field it sets — "Item kind",
-"Theme".
+One control, three payloads: the item kind (Text / Password) wherever a kind is shown, and the theme
+(System / Light / Dark) and the language (System / English / Polski) in Settings. A `role="group"` of
+buttons on a 2px-padded `--hover` wash with an 8px radius. The active button is a `--raise` chip with
+a 6px radius, `--fg` text and a 1px soft lift; the inactive one is plain `--muted` text that goes
+`--fg` on hover. Focus is a 2px accent outline offset by 1px. It is a segmented control, not a
+toggle: every option is always visible, each button is `aria-pressed`, and the group takes its
+`aria-label` from the field it sets — "Item kind", "Theme", "Language".
 
 The control owns its width, not its column. Inside an item row it sits in a fixed 128px kind column
 but is `justify-self: start`, so the `--hover` track ends where the Password segment ends instead of
@@ -680,14 +681,31 @@ padding. A fixed column fixes where a control starts, not how wide it stretches.
 
 ### Setting rows
 
-The Settings view's one list primitive, and the shape both of its sections wear: a
+The Settings view's one list primitive, and the shape all three of its sections wear: a
 `ul.setting-rows` of `li.setting-row`s inside a panel, each row a `minmax(0, 1fr) auto` grid holding
 the label block in the first column and the control in the second, `12px 0` of padding, and a
 `1px --line` rule on every row after the first. The label block stacks a 13px/550 title — carrying a
 count pill when the row acts on a number of records — over an 11.5px muted note capped at 48ch that
-states the consequence, not the mechanism. The control is whatever the setting is: the theme's
-segmented control, or a danger button with the two-step arm. Both sit `justify-self: end`, so every
-row in the section shares one right edge.
+states the consequence, not the mechanism. The control is whatever the setting is: the theme's or the
+language's segmented control, or a danger button with the two-step arm. Both sit `justify-self: end`,
+so every row in the section shares one right edge.
+
+### Language
+
+A setting row like the theme's, whose control is the segmented control with `System` and one segment
+per shipped language. Each language segment is labelled with the language's own name — `English`,
+`Polski` — never with a translation of it, so the picker reads the same whichever language is in
+force, and `System` is the only translated segment. The row's note names the language in force the way
+the theme's note names the scheme ("Follows your browser, which is English right now"), and the rail's
+reading is that same name alone once the language is pinned.
+
+No string a user reads is written into a component. Every one is a key in `src/shared/i18n/en.tsx`
+and `pl.tsx` — the two dictionaries are typed against each other, so a translation missing a key, or
+carrying one English does not have, fails the typecheck — and sentences that carry a count or a name
+are dictionary functions rather than concatenations, because Polish needs different word forms for
+one, few and many, and different cases again inside a sentence. Chrome's own surfaces — the toolbar
+tooltip and the store description — cannot be reached from the page, so they are translated in
+`public/_locales/` and follow the browser's UI language instead of this setting.
 
 ### Toggle switch
 

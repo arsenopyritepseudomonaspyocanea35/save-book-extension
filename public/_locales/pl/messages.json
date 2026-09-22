@@ -1,0 +1,10 @@
+{
+  "extDescription": {
+    "message": "Trzymaj loginy, liczby i notatki tam, gdzie ich potrzebujesz — obok witryn, na których ich używasz.",
+    "description": "The extension's one-line description, shown by Chrome."
+  },
+  "actionTitle": {
+    "message": "Save Book — pokaż lub ukryj kartę na tej stronie",
+    "description": "Tooltip on the toolbar button."
+  }
+}

@@ -4,6 +4,7 @@ import { IconButton } from '../ui/icon-button/icon-button';
 import { Segmented } from '../ui/segmented/segmented';
 import { EyeIcon, EyeOffIcon, XIcon } from '../ui/icons/icons';
 import { itemKindOptions, itemTypes } from '../shared/itemTypes';
+import { t } from '../shared/i18n';
 import { siteName } from '../shared/naming';
 import type { Item, ItemKind, Site } from '../shared/schema';
 
@@ -53,11 +54,11 @@ export const ItemEditor: Component<ItemEditorProps> = (props) => {
       <div class="panel">
         <div class="fields">
           <div class="field">
-            <span class="field-label">Kind</span>
+            <span class="field-label">{t('item.kind.label')}</span>
             <span class="kind-line">
               <Segmented
-                label="Item kind"
-                options={itemKindOptions}
+                label={t('item.kind.group')}
+                options={itemKindOptions()}
                 value={props.item.type}
                 onChange={(kind) => props.onKind(kind)}
               />
@@ -65,12 +66,12 @@ export const ItemEditor: Component<ItemEditorProps> = (props) => {
           </div>
           <div class="field">
             <label class="field-label" for={`item-label-${props.item.id}`}>
-              Label
+              {t('item.field.label')}
             </label>
             <input
               id={`item-label-${props.item.id}`}
               type="text"
-              placeholder="Optional, shown in the card"
+              placeholder={t('item.field.labelPlaceholder')}
               spellcheck={false}
               autocomplete="off"
               data-label-for={props.item.id}
@@ -82,13 +83,13 @@ export const ItemEditor: Component<ItemEditorProps> = (props) => {
 
         <div class="field value-field">
           <label class="field-label" for={`item-value-${props.item.id}`}>
-            Value
+            {t('item.field.value')}
           </label>
           <div class="value-wrap">
             <input
               id={`item-value-${props.item.id}`}
               type={definition().secret && !revealed() ? 'password' : 'text'}
-              placeholder={definition().placeholder}
+              placeholder={t(definition().placeholderKey)}
               spellcheck={false}
               autocomplete="off"
               value={props.item.value}
@@ -97,7 +98,7 @@ export const ItemEditor: Component<ItemEditorProps> = (props) => {
             <span class="field-actions">
               <Show when={definition().secret}>
                 <IconButton
-                  title={revealed() ? 'Hide the value' : 'Reveal the value'}
+                  title={revealed() ? t('item.hideValue') : t('item.revealValue')}
                   pressed={revealed()}
                   onClick={() => setRevealed((value) => !value)}
                 >
@@ -110,34 +111,31 @@ export const ItemEditor: Component<ItemEditorProps> = (props) => {
 
         <p class="hint value-hint">
           {assigned().length
-            ? `Stored once and shown on ${assigned().length} ${assigned().length === 1 ? 'site' : 'sites'
-            }: editing the value here changes it on all of them.`
-            : 'Stored once. No card shows it while it is not on any site.'}
+            ? t('item.valueHint.assigned', assigned().length)
+            : t('item.valueHint.unassigned')}
         </p>
       </div>
 
       <div class="panel">
         <div class="section-head">
-          <h2>Sites this item is on</h2>
+          <h2>{t('item.sites.title')}</h2>
         </div>
 
         <Show
           when={props.sites.length}
           fallback={
-            <p class="hint section-note">
-              Add a site in the Sites tab first — until then there is nowhere for this to show.
-            </p>
+            <p class="hint section-note">{t('item.sites.noSites')}</p>
           }
         >
           <div class="add">
             <select
-              aria-label="Site to add this item to"
+              aria-label={t('item.sites.selectLabel')}
               disabled={!available().length}
               value={available().length ? draft() : ''}
               onChange={(event) => setDraft(event.currentTarget.value)}
             >
               <Show when={!available().length}>
-                <option value="">On every site you have</option>
+                <option value="">{t('item.sites.noneAvailable')}</option>
               </Show>
               <For each={available()}>
                 {(site) => <option value={site.id}>{siteName(site)}</option>}
@@ -145,28 +143,20 @@ export const ItemEditor: Component<ItemEditorProps> = (props) => {
             </select>
             <Button
               disabled={!draft()}
-              title="Show this item on that site too"
+              title={t('item.sites.addTitle')}
               onClick={() => props.onAssign(draft())}
             >
-              Add
+              {t('item.sites.add')}
             </Button>
           </div>
         </Show>
 
-        <p class="hint section-note">
-          Adding shows the same value there; removing takes it off that site only and keeps it for
-          the others.
-        </p>
+        <p class="hint section-note">{t('item.sites.note')}</p>
 
         <ul class="site-list">
           <Show
             when={assigned().length}
-            fallback={
-              <li class="items-empty">
-                Not on any site yet. Pick one above, or open <strong>Sites</strong> to set up a site
-                it belongs on.
-              </li>
-            }
+            fallback={<li class="items-empty">{t('item.sites.empty')}</li>}
           >
             <For each={assigned()}>
               {(site) => (
@@ -174,14 +164,14 @@ export const ItemEditor: Component<ItemEditorProps> = (props) => {
                   <button
                     class="rail-title"
                     type="button"
-                    title="Open this site in the Sites tab"
+                    title={t('item.sites.openTitle')}
                     onClick={() => props.onOpenSite(site.id)}
                   >
                     {siteName(site)}
                   </button>
                   <span class="count">{props.counts[site.id] ?? 0}</span>
                   <IconButton
-                    title={`Remove from ${siteName(site)}`}
+                    title={t('item.sites.remove', siteName(site))}
                     danger
                     onClick={() => props.onUnassign(site.id)}
                   >
@@ -189,10 +179,10 @@ export const ItemEditor: Component<ItemEditorProps> = (props) => {
                   </IconButton>
                   <span class="rail-sub">
                     <span class="rail-sub-text">
-                      {site.label ? site.pattern : site.pattern === '*' ? 'every site' : ''}
+                      {site.label ? site.pattern : site.pattern === '*' ? t('common.everySite') : ''}
                     </span>
                     <Show when={!site.enabled}>
-                      <span class="flag">card off</span>
+                      <span class="flag">{t('item.sites.cardOff')}</span>
                     </Show>
                   </span>
                 </li>
@@ -204,12 +194,11 @@ export const ItemEditor: Component<ItemEditorProps> = (props) => {
         <div class="foot">
           <span class="hint">
             {props.item.sites.length
-              ? `One item, ${props.item.sites.length} ${props.item.sites.length === 1 ? 'site' : 'sites'
-              }.`
-              : 'One item, no sites yet.'}
+              ? t('item.foot.assigned', props.item.sites.length)
+              : t('item.foot.none')}
           </span>
           <Button variant="danger" onClick={confirmDelete}>
-            {armed() ? 'Click again to delete everywhere' : 'Delete item'}
+            {armed() ? t('item.deleteArmed') : t('item.delete')}
           </Button>
         </div>
       </div>

@@ -1,3 +1,4 @@
+import { t } from './i18n';
 import type { Item, Site } from './schema';
 
 export function siteName(site: Site): string {
@@ -6,6 +7,6 @@ export function siteName(site: Site): string {
 
 export function itemName(item: Item): string {
   if (item.label) return item.label;
-  if (item.type === 'secret') return 'Password';
-  return item.value || 'Untitled item';
+  if (item.type === 'secret') return t('item.kind.secret');
+  return item.value || t('item.untitled');
 }

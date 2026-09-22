@@ -1,4 +1,5 @@
 import { Show, type Component } from 'solid-js';
+import { t } from '../shared/i18n';
 import { siteName } from '../shared/naming';
 import type { Site } from '../shared/schema';
 
@@ -11,9 +12,9 @@ export const RouteStamp: Component<RouteStampProps> = (props) => (
   <Show when={props.sites.length > 1}>
    <span
     class="stamp"
-    title={`Shown on ${props.sites.length} sites: ${props.sites.map(siteName).join(', ')}`}
+    title={t('stamp.title', props.sites.length, props.sites.map(siteName).join(', '))}
    >
-    {props.sites.length} sites
+    {t('count.sites', props.sites.length)}
    </span>
   </Show>
  </span>

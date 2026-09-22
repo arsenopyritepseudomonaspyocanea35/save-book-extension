@@ -1,6 +1,7 @@
 import { For, Show, createEffect, createSignal, onCleanup, onMount, type Component } from 'solid-js';
 import { IconButton } from '../ui/icon-button/icon-button';
 import { ChevronIcon, CloseIcon, EyeIcon, EyeOffIcon, GripIcon } from '../ui/icons/icons';
+import { t } from '../shared/i18n';
 import { itemTypes } from '../shared/itemTypes';
 import type { Item, Site, SiteUI, Theme } from '../shared/schema';
 
@@ -42,7 +43,7 @@ const Row: Component<{ item: Item; copy: (item: Item) => Promise<boolean> }> = (
         classList={{ nolabel: !props.item.label }}
         role="button"
         tabindex="0"
-        title="Click to copy"
+        title={t('card.copyHint')}
         on:click={() => void activate()}
         on:keydown={(event) => {
           if (event.key !== 'Enter' && event.key !== ' ') return;
@@ -52,11 +53,11 @@ const Row: Component<{ item: Item; copy: (item: Item) => Promise<boolean> }> = (
       >
         <Show when={props.item.label}>{(label) => <span class="lbl">{label()}</span>}</Show>
         <span class="val" classList={{ copied: copied(), dim: !copied() && !shown() }}>
-          {copied() ? 'Copied' : shown() || '—'}
+          {copied() ? t('card.copied') : shown() || '—'}
         </span>
         <Show when={definition().secret}>
           <IconButton
-            title={revealed() ? 'Hide' : 'Reveal'}
+            title={revealed() ? t('card.hide') : t('card.reveal')}
             pressed={revealed()}
             onClick={(event) => {
               event.stopPropagation();
@@ -172,10 +173,13 @@ export const Card: Component<CardProps> = (props) => {
         </span>
         <span class="title">{props.site.label || props.site.pattern}</span>
         <span class="acts">
-          <IconButton title="Collapse" onClick={() => props.onPatchUi({ collapsed: !props.site.ui.collapsed })}>
+          <IconButton
+            title={t('card.collapse')}
+            onClick={() => props.onPatchUi({ collapsed: !props.site.ui.collapsed })}
+          >
             <ChevronIcon />
           </IconButton>
-          <IconButton title="Hide card" onClick={() => props.onPatchUi({ hidden: true })}>
+          <IconButton title={t('card.hideCard')} onClick={() => props.onPatchUi({ hidden: true })}>
             <CloseIcon />
           </IconButton>
         </span>
@@ -186,9 +190,9 @@ export const Card: Component<CardProps> = (props) => {
           when={props.items.length}
           fallback={
             <li class="empty">
-              <span>No items yet</span>
+              <span>{t('card.empty')}</span>
               <button class="link" type="button" on:click={() => props.onOpenOptions()}>
-                Add items
+                {t('card.addItems')}
               </button>
             </li>
           }
