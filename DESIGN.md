@@ -767,11 +767,15 @@ rather than a documented rule.
 
 The store rasters keep their provenance and must not be silently regenerated:
 
-- `store/screenshot-2-options.jpg` and `store/screenshot-3-options-dark.jpg` were captured by this
-  build thread from the running extension on 2026-09-22, and show the settings page as recorded
-  here (light and dark).
-- `store/screenshot-1-card.jpg`, `store/promo-marquee-1400x560.jpg`,
-  `store/promo-small-440x280.jpg`, `store/icon-128.png` and the store SVGs pre-date this work.
+- All five `store/screenshot-*.jpg` were captured on 2026-09-22 from a build of this tree: `1-card`
+  shows the card on a staging sign-in page and is a 2× detail — a 640×400 viewport at a device pixel
+  ratio of 2, so the card is the subject rather than a corner of a wide page; `2-options` and
+  `3-options-dark` are the Sites view, light and dark; `4-settings-dark` and `5-items-dark` are the
+  Views strip's other two tabs. Each was rendered from the built bundles against a stubbed
+  `chrome.storage` (the store seeded with the synthetic Northwind content), not saved from a hand-
+  driven browser.
+- `store/promo-marquee-1400x560.jpg`, `store/promo-small-440x280.jpg`, `store/icon-128.png` and the
+  store SVGs pre-date this work.
 
 ## Do's and Don'ts
 
