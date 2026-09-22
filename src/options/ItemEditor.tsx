@@ -91,14 +91,17 @@ export const ItemEditor: Component<ItemEditorProps> = (props) => {
               value={props.item.value}
               onInput={(event) => props.onValue(event.currentTarget.value)}
             />
-            <Show when={definition().secret}>
-              <IconButton
-                title="Show / hide the value"
-                onClick={() => setRevealed((value) => !value)}
-              >
-                {revealed() ? <EyeOffIcon /> : <EyeIcon />}
-              </IconButton>
-            </Show>
+            <span class="field-actions">
+              <Show when={definition().secret}>
+                <IconButton
+                  title={revealed() ? 'Hide the value' : 'Reveal the value'}
+                  pressed={revealed()}
+                  onClick={() => setRevealed((value) => !value)}
+                >
+                  {revealed() ? <EyeOffIcon /> : <EyeIcon />}
+                </IconButton>
+              </Show>
+            </span>
           </div>
         </div>
 

@@ -56,6 +56,7 @@ const Row: Component<{ item: Item; copy: (item: Item) => Promise<boolean> }> = (
         <Show when={definition().secret}>
           <IconButton
             title={revealed() ? 'Hide' : 'Reveal'}
+            pressed={revealed()}
             onClick={(event) => {
               event.stopPropagation();
               setRevealed((value) => !value);

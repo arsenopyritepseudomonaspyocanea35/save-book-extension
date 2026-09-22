@@ -52,9 +52,13 @@ export const ItemRow: Component<ItemRowProps> = (props) => {
     onInput={(event) => props.onValue(event.currentTarget.value)}
    />
 
-   <span class="item-actions">
+   <span class="field-actions">
     <Show when={definition().secret}>
-     <IconButton title="Show / hide the value" onClick={() => setRevealed((value) => !value)}>
+     <IconButton
+      title={revealed() ? 'Hide the value' : 'Reveal the value'}
+      pressed={revealed()}
+      onClick={() => setRevealed((value) => !value)}
+     >
       {revealed() ? <EyeOffIcon /> : <EyeIcon />}
      </IconButton>
     </Show>

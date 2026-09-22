@@ -158,6 +158,12 @@ select:focus-visible {
   gap: 6px;
 }
 
+/* A row's controls share one height, so a button never sits 2px proud of the field beside it. */
+.add .button,
+.field-row .button {
+  height: 34px;
+}
+
 /* A stored value or a host pattern is data, and reads as data on both sides of the product. */
 input.input-mono,
 .value-wrap input,
@@ -504,7 +510,7 @@ code {
   --icon-button-size: 28px;
 }
 
-.item-actions,
+.field-actions,
 .stamp-slot {
   display: flex;
   align-items: center;
@@ -521,9 +527,13 @@ code {
 
 .value-wrap {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) 28px;
   gap: 4px;
   align-items: center;
+}
+
+.value-wrap .icon-button {
+  --icon-button-size: 28px;
 }
 
 .foot {
@@ -713,7 +723,7 @@ code {
     grid-area: value;
   }
 
-  .item > .item-actions {
+  .item > .field-actions {
     grid-area: reveal;
   }
 

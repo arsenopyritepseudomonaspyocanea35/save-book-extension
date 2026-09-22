@@ -106,6 +106,8 @@ spacing:
   rail-width-narrow: "252px"
   list-gap: "1px"
   row-padding: "7px 9px"
+  row-column-gap: "8px"
+  row-line-gap: "6px"
   panel-padding: "16px 18px"
   panel-gap: "14px"
   field-gap: "16px"
@@ -133,6 +135,13 @@ components:
     rounded: "{rounded.md}"
     padding: "0 14px"
     height: "36px"
+  button-field:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.ink}"
+    typography: "{typography.control}"
+    rounded: "{rounded.md}"
+    padding: "0 14px"
+    height: "34px"
   button-ghost-sm:
     backgroundColor: "transparent"
     textColor: "{colors.muted}"
@@ -420,13 +429,28 @@ canvas. Both panes scroll inside a 100vh shell rather than the page scrolling.
 
 Spacing rhythm is intentionally two-speed. Index lists are dense: a 1px gap between rail rows and
 between site rows, with 7px 9px of padding inside each row, so a long list reads as a ruled table.
-Anything editable gets air: 6px between item rows, 16px between the columns of the field grid, 14px
-between the field groups, 14px between panels, 16px 18px inside a panel.
+Anything editable gets air: 6px between item rows (8px between the columns inside one), 16px
+between the columns of the field grid, 14px between the field groups, 14px between panels, 16px 18px
+inside a panel. A control that sits beside a field matches the field's height: a picker row's button
+is 34px, not the 36px it takes on its own.
 
 Responsive behaviour is two steps. Under 1180px the rail narrows to 252px. Under 900px the shell
 stops being a viewport grid: the bar becomes auto-height, the view collapses to one column, the rail
 becomes a block capped at 48vh with a bottom hairline instead of a right one, the main pane drops to
 16px 14px 36px padding and scrolls with the page, and the two-column field grid becomes one column.
+An item row also reflows, from six columns onto three named lines over
+`118px minmax(0, 1fr) 28px` with a 6px row gap: `'kind label label' / 'value value reveal' /
+'stamp stamp remove'`. The fields change rows but never lose their own column, so the narrow layout
+is a rewrap of the same grid rather than a different structure.
+
+### Named Rules
+
+**The Fixed Slot Rule.** A field's position and width are its own grid column, never a consequence
+of what its row happens to contain. The reveal slot and the stamp slot are rendered in every item row
+whether or not there is an eye or a pill to put in them, and the editor's value field keeps the same
+28px for its reveal button whether the item is text or secret. The same field therefore lands on the
+same x and the same width in every row of a list — measured identical at 1440, 1280 and 1024, and
+identical per column at 390.
 
 The on-page card is not part of this grid. It is a fixed, absolutely-positioned 272px panel
 (dark or light by the page's scheme) clamped 12px from the viewport edges, moved with a transform
@@ -474,7 +498,9 @@ gets its shape from a padded wash rather than per-segment borders.
 Icons are authored SVG, 16×16 viewBox at 13–14px render, `currentColor`, one stroke family:
 1.3–1.6px strokes with round caps and joins, `fill="none"` for strokes and solid fills only for
 the eye's pupil and the grip's dot grid. Icons are never glyphs, never emoji, never an icon font,
-and never the only carrier of meaning — every icon button carries both `title` and `aria-label`.
+and never the only carrier of meaning — every icon button carries both `title` and `aria-label`,
+and a toggle's `title` names the action it will take next ("Reveal the value" / "Hide the value",
+"Reveal" / "Hide" in the card) alongside `aria-pressed`.
 
 ## Components
 
@@ -484,7 +510,10 @@ Four variants of one button, all 36px tall with an 8px radius and a 13.5px/520 l
 colour on hover and taking a 2px accent outline offset by 1px on focus.
 
 - **Shape:** 36px tall, `--radius-md` (8px), `0 14px` padding, 6px gap when a leading icon is
-  present. The compact rail variant drops to 30px tall with `0 10px` padding and a 12.5px label.
+  present. Beside a field — a picker row's "Add", a domain row's "Apply" — a button drops to 34px so
+  the row reads as one line rather than as a field with a slightly taller object next to it. The
+  compact rail variant (`+ Text` / `+ Password`) drops to 30px tall with `0 10px` padding and a
+  12.5px label.
 - **Default:** `--surface` fill, `--line-strong` border, `--fg` text. This is the "Apply" and site
   picker "Add" button.
 - **Primary:** `--accent` fill, `--accent-fg` text, transparent border. Used exactly once per rail —
@@ -506,8 +535,9 @@ rather than an action.
   with tabular figures, `min-width: 20px` (18px inside a tab) and centred so the number never moves
   its neighbours. Present on every rail row on both tabs and on every site row.
 - **Route stamp:** the `n sites` badge on an item row, saying out loud that one value stands on
-  several hosts. Same pill treatment as a count, plus a `title` naming the sites; it renders only
-  when the count exceeds one, so a single-site item carries no badge at all.
+  several hosts. Same pill treatment as a count, plus a `title` naming the sites. The pill itself
+  renders only when the count exceeds one, but the `.stamp-slot` that holds it is always rendered,
+  so a row without a badge keeps the same column widths as one with it.
 - **Flag pill:** a bordered, unfilled pill — 1px `--line-strong`, 10.5px sans text, `1px 6px`.
   Two payloads only: `card off` (the site is disabled) and `not on any site` (the item is in the
   pool with no assignment). It sits inside the mono subline and deliberately resets to the sans
@@ -539,10 +569,15 @@ rather than an action.
   and a text field are the same object. Fields are always wrapped by a label whose `.field-label`
   span sits 11.5px/550 muted, 6px above the control.
 - **Data fields:** any input carrying a host pattern or a stored value switches to mono at 12.5px
-  (`input-mono`, and both value inputs) — the one typographic change a field can make.
+  (`input-mono`, `.item-value`, and the editor's value input) — the one typographic change a field
+  can make.
 - **Focus:** no outline. The border becomes `--accent` and gains `--ring`, a 3px
   `color-mix(accent 18%)` halo. This is distinct from the 2px solid accent outline used on
   buttons and rows.
+- **Reserved reveal slot:** the editor's value field is a two-column grid,
+  `minmax(0, 1fr) 28px`, and the second column holds a `.field-actions` span whether or not the item
+  is a secret. The value input's right edge is therefore the same for a text item and a masked one,
+  and the eye appears in a space that was already reserved for it.
 - **Hidden field note:** the switch's checkbox is `position: absolute; opacity: 0` — the real
   control is the track, so focus styling lands on the track and the input keeps native semantics.
 
@@ -574,10 +609,16 @@ rather than an action.
 Both settings views are the same record read from opposite ends, and the code makes the mirror
 literal: an item's site rows reuse the rail's own title class rather than a copy of its styles.
 
-- **A site's items (Sites tab panel):** a list of `.item` rows, each one line that wraps — segmented
-  kind control, label input (flex 1 1 150px), value input with the reveal eye (flex 1.4 1 190px),
-  the `n sites` stamp, and a 30px danger icon button pushed to the far right. Rows are 6px apart.
-  Removing here takes the item off this site only, and the panel says so above the list.
+- **A site's items (Sites tab panel):** a list of `.item` rows, each a single line built as a
+  six-column grid — `128px minmax(0, 1fr) minmax(0, 1.15fr) 28px 74px 30px` at `gap: 8px` — holding,
+  in order, the `.kind-switch`, the `.item-label` input, the mono `.item-value` input, a
+  `.field-actions` slot, a `.stamp-slot`, and the remove icon button (28px, `justify-self: end`).
+  Two of those columns are slots rather than content: `.field-actions` carries the reveal eye only
+  for a masked item, and `.stamp-slot` carries the `n sites` pill only for an item on more than one
+  site — both are always rendered, and they share one rule,
+  `.field-actions, .stamp-slot { display: flex; align-items: center; justify-content: flex-end }`.
+  Rows are 6px apart. Removing here takes the item off this site only, and the panel says so above
+  the list.
 - **An item's sites (Items tab panel):** a picker row (a select of the sites the item is *not* yet
   on, plus an "Add" button) above a list of `.site-row`s, each a grid of
   `minmax(0,1fr) auto auto` — the site name as a rail-title button, the count pill of items on that
@@ -652,6 +693,9 @@ The store rasters keep their provenance and must not be silently regenerated:
   field grid 16px.
 - **Do** reuse the rail's classes (`rail-title`, `rail-sub`, `count`, `flag`) when a new view shows
   the same record from another end — the mirror in this product is literal in code, not a lookalike.
+- **Do** give every field its own column and render its slot even when it is empty — the reveal and
+  stamp slots in an item row, and the editor's 28px value slot — so a field never moves or resizes
+  because of what a neighbouring row contains.
 - **Do** cap prose at 62ch (sections) and 48ch (panel footers), and cap editor content at 860px.
 - **Do** keep body text at 13px, labels at 11.5px/550, and never exceed 19px.
 - **Do** give destructive controls the red token plus the two-step arm (the label becomes
