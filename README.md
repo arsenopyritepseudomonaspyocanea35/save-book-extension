@@ -100,6 +100,10 @@ To cut a release: bump `version` in `public/manifest.json`, commit and push, the
 **release** mode. That same zip is what you upload to the Chrome Web Store dashboard — the store
 requires each upload to carry a higher version than the last one published.
 
+The listing itself is not in the zip: the Title and the Summary are filled from the package
+(`name`, and `description` out of `public/_locales/<lang>/messages.json`), while the long description
+is dashboard-only metadata. That description is kept, one block per language, in [STORE.md](STORE.md).
+
 ## Privacy
 
 Nothing you save leaves your browser. See [PRIVACY.md](PRIVACY.md) for the full policy, including
