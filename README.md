@@ -43,8 +43,8 @@ Then open the extension's options page, add a domain, and approve Chrome's promp
 - The card renders into a shadow root, so the host page's CSS cannot reach it, and it stops click
   propagation so pages never observe interaction with it.
 - Items live in `chrome.storage.local` as one pool, each item carrying the sites it is shown on. A
-  store written by an older version is folded into that pool on first read. There is no server and
-  no network code.
+  store written by an older version is folded into that pool on first read, one file per hop under
+  `src/shared/migrations/`. There is no server and no network code.
 
 ## Development
 
@@ -61,7 +61,7 @@ src/
   background/   service worker — keeps registered content scripts in sync
   content/      the on-page card
   options/      the settings page
-  shared/       schema, storage, host matching, item registry
+  shared/       schema, storage, migrations, host matching, item registry
   ui/           shared components and design tokens
 store/          Chrome Web Store listing assets (icon, screenshots, promo tiles)
 ```
