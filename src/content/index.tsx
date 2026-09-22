@@ -7,7 +7,6 @@ import type { CardToBackground, BackgroundToCard } from '../shared/messages';
 import { findSite } from '../shared/pattern';
 import type { Item, Site, SiteUI } from '../shared/schema';
 import { onStoreChanged, patchSite, readStore } from '../shared/store';
-
 declare global {
   var __savebookBoot: Promise<void> | null | undefined;
 }
@@ -20,7 +19,7 @@ async function copyText(text: string): Promise<boolean> {
       await navigator.clipboard.writeText(text);
       return true;
     }
-  } catch {}
+  } catch { }
   try {
     const area = document.createElement('textarea');
     area.value = text;
@@ -68,13 +67,16 @@ async function boot(): Promise<void> {
 
   const { host, shadow } = createHost();
   const [site, setSite] = createSignal<Site | undefined>(initial);
+  const [items, setItems] = createSignal<Item[]>(
+    store.items.filter((item) => item.sites.includes(initial.id)),
+  );
   let dispose: (() => void) | undefined;
   let unsubscribe: (() => void) | undefined;
 
   const patchUi = (patch: Partial<SiteUI>) => {
     const current = site();
     if (!current) return;
-    void patchSite(current.id, (target) => Object.assign(target.ui, patch)).catch(() => {});
+    void patchSite(current.id, (target) => Object.assign(target.ui, patch)).catch(() => { });
   };
 
   function onMessage(
@@ -97,7 +99,7 @@ async function boot(): Promise<void> {
 
   const openOptions = () => {
     const message: CardToBackground = { type: 'sb:open-options' };
-    void chrome.runtime.sendMessage(message).catch(() => {});
+    void chrome.runtime.sendMessage(message).catch(() => { });
   };
 
   const copy = (item: Item) => copyText(itemTypes[item.type].copy(item));
@@ -108,6 +110,7 @@ async function boot(): Promise<void> {
         {(current) => (
           <Card
             site={current()}
+            items={items()}
             host={host}
             onPatchUi={patchUi}
             onOpenOptions={openOptions}
@@ -126,6 +129,7 @@ async function boot(): Promise<void> {
       return;
     }
     setSite(next);
+    setItems(changed.items.filter((item) => item.sites.includes(next.id)));
   });
 
   chrome.runtime.onMessage.addListener(onMessage);

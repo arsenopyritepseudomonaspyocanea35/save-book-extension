@@ -10,6 +10,7 @@ const COPY_MS = 1000;
 
 export interface CardProps {
   site: Site;
+  items: Item[];
   host: HTMLElement;
   onPatchUi: (patch: Partial<SiteUI>) => void;
   onOpenOptions: () => void;
@@ -179,7 +180,7 @@ export const Card: Component<CardProps> = (props) => {
       <div class="sep" />
       <ul class="items">
         <Show
-          when={props.site.items.length}
+          when={props.items.length}
           fallback={
             <li class="empty">
               <span>No items yet</span>
@@ -189,7 +190,7 @@ export const Card: Component<CardProps> = (props) => {
             </li>
           }
         >
-          <For each={props.site.items}>{(item) => <Row item={item} copy={props.copy} />}</For>
+          <For each={props.items}>{(item) => <Row item={item} copy={props.copy} />}</For>
         </Show>
       </ul>
     </div>

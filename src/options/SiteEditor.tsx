@@ -1,13 +1,18 @@
 import { For, Show, createSignal, onCleanup, type Component } from 'solid-js';
 import { Button } from '../ui/button/button';
 import { Field } from '../ui/field/field';
+import { PlusIcon } from '../ui/icons/icons';
 import { ItemRow } from './ItemRow';
 import { parsePattern } from '../shared/pattern';
 import { itemTypeList } from '../shared/itemTypes';
-import type { ItemKind, Site } from '../shared/schema';
+import type { Item, ItemKind, Site } from '../shared/schema';
 
 export interface SiteEditorProps {
   site: Site;
+  /** Every site in the store, so a shared item can name where else it lives. */
+  sites: Site[];
+  /** Items routed to this site, in pool order. */
+  items: Item[];
   patternDraft: string;
   onPatternDraft: (value: string) => void;
   onApplyPattern: () => void;
@@ -95,27 +100,38 @@ export const SiteEditor: Component<SiteEditorProps> = (props) => {
 
       <div class="panel">
         <div class="section-head">
-          <h2>Items</h2>
+          <h2>Items on this site</h2>
           <div class="kinds">
             <For each={itemTypeList}>
               {(definition) => (
                 <Button variant="ghost" onClick={() => props.onAddItem(definition.kind)}>
-                  + {definition.label}
+                  <PlusIcon />
+                  {definition.label}
                 </Button>
               )}
             </For>
           </div>
         </div>
+        <p class="hint section-note">
+          Items are shared: a value edited here changes on every site it is shown on. Removing one
+          here takes it off this site only.
+        </p>
 
         <ul class="items">
           <Show
-            when={props.site.items.length}
-            fallback={<li class="empty">No items yet — add the first one.</li>}
+            when={props.items.length}
+            fallback={
+              <li class="items-empty">
+                Nothing saved for this site yet. Add one below, or route an item you already keep on
+                another site from <strong>Items</strong>.
+              </li>
+            }
           >
-            <For each={props.site.items}>
+            <For each={props.items}>
               {(item) => (
                 <ItemRow
                   item={item}
+                  shownOn={props.sites.filter((site) => item.sites.includes(site.id))}
                   onLabel={(value) => props.onItemLabel(item.id, value)}
                   onValue={(value) => props.onItemValue(item.id, value)}
                   onKind={(kind) => props.onItemKind(item.id, kind)}

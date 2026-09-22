@@ -7,7 +7,10 @@ the page. A small, draggable card shows your saved items on the sites you choose
 
 ## What it does
 
-- You pick the sites; each one gets its own list of items — a label plus a value, or a masked secret.
+- You pick the sites; each one shows a list of items — a label plus a value, or a masked secret.
+- An item is stored once and shown wherever you add it, so one staging login can live on three
+  sites without being typed three times. Settings holds two views of the same data: a site's items,
+  and an item's sites.
 - On those sites, and only those, the card appears. Click a row to copy the value.
 - Drag the card wherever suits you. Position, collapsed state and visibility are remembered per site.
 - Everything is configured in the extension's settings page. Toggle the card from the toolbar icon.
@@ -39,7 +42,9 @@ Then open the extension's options page, add a domain, and approve Chrome's promp
   permission back when that site is removed.
 - The card renders into a shadow root, so the host page's CSS cannot reach it, and it stops click
   propagation so pages never observe interaction with it.
-- Items live in `chrome.storage.local`. There is no server and no network code.
+- Items live in `chrome.storage.local` as one pool, each item carrying the sites it is shown on. A
+  store written by an older version is folded into that pool on first read. There is no server and
+  no network code.
 
 ## Development
 

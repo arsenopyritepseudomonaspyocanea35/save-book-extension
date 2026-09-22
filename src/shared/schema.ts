@@ -2,7 +2,7 @@ import * as v from 'valibot';
 import { parsePattern } from './pattern';
 
 export const STORAGE_KEY = 'saveBook';
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 export const ITEM_KINDS = ['text', 'secret'] as const;
 export const ItemKindSchema = v.picklist(ITEM_KINDS);
@@ -13,6 +13,7 @@ const ItemSchema = v.object({
   type: v.fallback(ItemKindSchema, 'text'),
   label: v.fallback(v.string(), ''),
   value: v.fallback(v.string(), ''),
+  sites: v.fallback(v.array(v.string()), () => []),
 });
 
 const DEFAULT_UI = { x: null, y: null, collapsed: false, hidden: false };
@@ -29,14 +30,14 @@ const SiteSchema = v.object({
   pattern: v.fallback(v.string(), ''),
   label: v.fallback(v.string(), ''),
   enabled: v.fallback(v.boolean(), true),
-  origins: v.fallback(v.array(v.string()), []),
-  items: v.fallback(v.array(v.unknown()), []),
+  origins: v.fallback(v.array(v.string()), () => []),
   ui: v.fallback(SiteUiSchema, () => ({ ...DEFAULT_UI })),
 });
 
 const StoreShapeSchema = v.object({
   version: v.fallback(v.number(), SCHEMA_VERSION),
-  sites: v.fallback(v.array(v.unknown()), []),
+  sites: v.fallback(v.array(v.unknown()), () => []),
+  items: v.fallback(v.array(v.unknown()), () => []),
 });
 
 export type Item = v.InferOutput<typeof ItemSchema>;
@@ -48,43 +49,82 @@ export interface Site {
   label: string;
   enabled: boolean;
   origins: string[];
-  items: Item[];
   ui: SiteUI;
 }
 
 export interface Store {
   version: number;
   sites: Site[];
+  items: Item[];
 }
 
 function parseSite(raw: unknown): Site | undefined {
   const parsed = v.safeParse(SiteSchema, raw);
   if (!parsed.success) return undefined;
+  return { ...parsed.output, pattern: parsePattern(parsed.output.pattern) };
+}
+
+/** Items nested inside a site record: the schema-1 shape, still read so old stores migrate. */
+function nestedItems(raw: unknown): Item[] {
+  if (typeof raw !== 'object' || raw === null || !('items' in raw)) return [];
+  const candidates = raw.items;
+  if (!Array.isArray(candidates)) return [];
   const items: Item[] = [];
-  for (const candidate of parsed.output.items) {
-    const item = v.safeParse(ItemSchema, candidate);
-    if (item.success) items.push(item.output);
+  for (const candidate of candidates) {
+    const parsed = v.safeParse(ItemSchema, candidate);
+    if (parsed.success) items.push(parsed.output);
   }
-  return { ...parsed.output, pattern: parsePattern(parsed.output.pattern), items };
+  return items;
 }
 
 export function parseStore(raw: unknown): Store {
   const shape = v.safeParse(StoreShapeSchema, raw);
   if (!shape.success) return emptyStore();
+
   const sites: Site[] = [];
+  const nested: { item: Item; siteId: string }[] = [];
   for (const candidate of shape.output.sites) {
     const site = parseSite(candidate);
-    if (site) sites.push(site);
+    if (!site) continue;
+    sites.push(site);
+    for (const item of nestedItems(candidate)) nested.push({ item, siteId: site.id });
   }
-  return { version: SCHEMA_VERSION, sites };
+
+  const known = new Set(sites.map((site) => site.id));
+  const items: Item[] = [];
+  const folded = new Map<string, Item>();
+
+  // A site's own items become pool items; identical ones (same kind, label and value) fold into a
+  // single item carrying every site that had it, which is exactly what the shared pool is for.
+  for (const { item, siteId } of nested) {
+    const key = `${item.type}\u0000${item.label}\u0000${item.value}`;
+    const twin = folded.get(key);
+    if (twin) {
+      if (!twin.sites.includes(siteId)) twin.sites.push(siteId);
+      continue;
+    }
+    item.sites = [siteId];
+    folded.set(key, item);
+    items.push(item);
+  }
+
+  for (const candidate of shape.output.items) {
+    const parsed = v.safeParse(ItemSchema, candidate);
+    if (!parsed.success) continue;
+    const item = parsed.output;
+    item.sites = [...new Set(item.sites)].filter((id) => known.has(id));
+    items.push(item);
+  }
+
+  return { version: SCHEMA_VERSION, sites, items };
 }
 
 export function emptyStore(): Store {
-  return { version: SCHEMA_VERSION, sites: [] };
+  return { version: SCHEMA_VERSION, sites: [], items: [] };
 }
 
-export function createItem(kind: ItemKind): Item {
-  return { id: crypto.randomUUID(), type: kind, label: '', value: '' };
+export function createItem(kind: ItemKind, sites: string[] = []): Item {
+  return { id: crypto.randomUUID(), type: kind, label: '', value: '', sites: [...sites] };
 }
 
 export function createSite(pattern: string, origins: string[]): Site {
@@ -94,7 +134,6 @@ export function createSite(pattern: string, origins: string[]): Site {
     label: '',
     enabled: true,
     origins,
-    items: [],
     ui: { ...DEFAULT_UI },
   };
 }
