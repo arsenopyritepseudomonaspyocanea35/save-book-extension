@@ -400,9 +400,20 @@ code {
   line-height: 1.5;
 }
 
+/* A panel's explanatory note sits one gap below whatever it follows: the section heading pulls it
+   in tight (the heading's own 10px margin makes 6px), and a control row gets the same 6px by
+   number, because a bordered field leaves less air than a heading's baseline does. */
 .section-note {
-  margin: -4px 0 12px;
+  margin: 0 0 12px;
   max-width: 62ch;
+}
+
+.section-head + .section-note {
+  margin-top: -4px;
+}
+
+.add + .section-note {
+  margin-top: 6px;
 }
 
 .section-head {
