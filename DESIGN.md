@@ -562,9 +562,11 @@ rather than an action.
   renders only when the count exceeds one, but the `.stamp-slot` that holds it is always rendered,
   so a row without a badge keeps the same column widths as one with it.
 - **Flag pill:** a bordered, unfilled pill — 1px `--line-strong`, 10.5px sans text, `1px 6px`.
-  Two payloads only: `card off` (the site is disabled) and `not on any site` (the item is in the
-  pool with no assignment). It sits inside the mono subline and deliberately resets to the sans
-  family so it reads as a stamp rather than as data. Icons are never used inside pills.
+  Three payloads: `card off` (the site is switched off), `no access` (Chrome was never granted this
+  domain, so no card can show there — it takes the slot only while the site is switched on), and
+  `not on any site` (the item is in the pool with no assignment). It sits inside the mono subline and
+  deliberately resets to the sans family so it reads as a stamp rather than as data. Icons are never
+  used inside pills.
 
 ### Cards / Containers
 

@@ -38,6 +38,7 @@ export function App() {
   const [newPattern, setNewPattern] = createSignal('');
   const [filter, setFilter] = createSignal('');
   const [toast, setToast] = createSignal<{ text: string; kind: ToastKind } | null>(null);
+  const [noAccess, setNoAccess] = createSignal<Record<string, boolean>>({});
   const touchedUi = new Set<string>();
   let saveTimer = 0;
   let toastTimer = 0;
@@ -120,6 +121,38 @@ export function App() {
     await chrome.permissions.remove({ origins: drop }).catch(() => { });
   };
 
+  const holdsAccess = async (site: Site): Promise<boolean> => {
+    const origins = [...site.origins];
+    if (!origins.length) return false;
+    try {
+      return await chrome.permissions.contains({ origins });
+    } catch {
+      return false;
+    }
+  };
+
+  const refreshAccess = async () => {
+    const checks = await Promise.all(
+      store.sites.map(async (site) => [site.id, !(await holdsAccess(site))] as const),
+    );
+    setNoAccess(Object.fromEntries(checks));
+  };
+
+  const grantAccess = async (site: Site) => {
+    const origins = [...site.origins];
+    if (!origins.length) return;
+    let granted = false;
+    try {
+      granted = await chrome.permissions.request({ origins });
+    } catch {
+      granted = false;
+    }
+    await refreshAccess();
+    if (!granted) {
+      notify(`Chrome access to ${site.pattern} was not granted, so no card shows there`, 'error');
+    }
+  };
+
   const addSite = async (raw: string) => {
     const pattern = parsePattern(raw);
     if (!pattern) {
@@ -141,6 +174,7 @@ export function App() {
     setStore('sites', (sites) => [...sites, site]);
     setSelectedSiteId(site.id);
     await persistNow();
+    void refreshAccess();
     setNewPattern('');
     notify(`Added ${pattern}. Reload that site to see the card.`);
   };
@@ -170,6 +204,7 @@ export function App() {
     setStore('sites', index, 'origins', originsFor(pattern));
     await persistNow();
     await dropOrigins(previous);
+    await refreshAccess();
     notify('Domain updated. Reload that site to see the card.');
   };
 
@@ -187,6 +222,7 @@ export function App() {
     if (selectedSiteId() === site.id) setSelectedSiteId(store.sites[0]?.id ?? null);
     await persistNow();
     await dropOrigins(origins);
+    await refreshAccess();
     notify(`Removed ${site.pattern}. Anything saved only there is now in “Not on any site”.`);
   };
 
@@ -195,6 +231,7 @@ export function App() {
     if (index < 0) return;
     setStore('sites', index, 'enabled', enabled);
     void persistNow();
+    if (enabled && noAccess()[site.id]) void grantAccess(site);
   };
 
   const resetCard = (site: Site) => {
@@ -344,6 +381,7 @@ export function App() {
     setSelectedSiteId(initial.sites[0]?.id ?? null);
     setSelectedItemId(initial.items[0]?.id ?? null);
     setLoaded(true);
+    void refreshAccess();
 
     try {
       const bag = await chrome.storage.session.get('pendingPattern');
@@ -357,6 +395,12 @@ export function App() {
       notify(`Press Add to give Save Book access to ${pattern}.`);
       requestAnimationFrame(() => patternInput?.focus());
     } catch { }
+  });
+
+  onMount(() => {
+    const onPermissions = () => void refreshAccess();
+    chrome.permissions.onAdded.addListener(onPermissions);
+    chrome.permissions.onRemoved.addListener(onPermissions);
   });
 
   return (
@@ -418,6 +462,7 @@ export function App() {
               <SiteList
                 sites={store.sites}
                 counts={siteCounts()}
+                noAccess={noAccess()}
                 selectedId={selectedSiteId()}
                 onSelect={setSelectedSiteId}
               />
@@ -448,6 +493,8 @@ export function App() {
                       patternDraft={patternDraft()}
                       onPatternDraft={setPatternDraft}
                       onApplyPattern={() => void changePattern(site(), patternDraft())}
+                      needsAccess={noAccess()[site().id] === true}
+                      onGrantAccess={() => void grantAccess(site())}
                       onLabel={(value) => {
                         const index = indexOfSite(site().id);
                         if (index < 0) return;

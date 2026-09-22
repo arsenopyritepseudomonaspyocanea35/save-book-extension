@@ -37,7 +37,8 @@ site — an instrument that lives on the page, not a popup or a manager app.
 - Item kinds today: plain text and masked secret. The masked row reveals on demand; clicking a row
   copies the value.
 - Per-site card state: position, collapsed, hidden.
-- A `*` pattern means every site.
+- A `*` pattern means every site: its card runs wherever Chrome access exists, and its items show
+  alongside the items of any narrower site that also matches the page.
 - Settings is a full-tab extension page; distribution is the Chrome Web Store plus a committed
   release zip and a GitHub Actions release workflow.
 
@@ -45,7 +46,9 @@ site — an instrument that lives on the page, not a popup or a manager app.
 
 - Storage key `saveBook`, valibot-validated, versioned schema (`SCHEMA_VERSION`) with tolerant
   parsing of unknown/partial records.
-- Adding a site asks Chrome for that origin at runtime; removing a site hands the permission back.
+- Adding a site asks Chrome for that origin at runtime; removing a site hands the permission back. A
+  site with no granted access carries a `no access` flag in the rail, and switching it on or pressing
+  `Grant access` asks Chrome again.
 - The service worker keeps registered content scripts in sync with enabled, granted sites.
 - No server, no network code, no accounts, no sync.
 - Items live in one shared pool: each item carries the list of sites it is shown on, so the same

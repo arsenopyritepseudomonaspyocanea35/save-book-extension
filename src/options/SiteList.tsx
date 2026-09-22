@@ -5,6 +5,7 @@ import type { Site } from '../shared/schema';
 export interface SiteListProps {
   sites: Site[];
   counts: Record<string, number>;
+  noAccess: Record<string, boolean>;
   selectedId: string | null;
   onSelect: (id: string) => void;
 }
@@ -29,6 +30,11 @@ export const SiteList: Component<SiteListProps> = (props) => (
                 </span>
                 <Show when={!site.enabled}>
                   <span class="flag">card off</span>
+                </Show>
+                <Show when={site.enabled && props.noAccess[site.id]}>
+                  <span class="flag" title="Chrome access to this domain was not granted">
+                    no access
+                  </span>
                 </Show>
               </span>
             </button>

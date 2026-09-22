@@ -14,6 +14,8 @@ export interface SiteEditorProps {
   patternDraft: string;
   onPatternDraft: (value: string) => void;
   onApplyPattern: () => void;
+  needsAccess: boolean;
+  onGrantAccess: () => void;
   onLabel: (value: string) => void;
   onEnabled: (enabled: boolean) => void;
   onAddItem: (kind: ItemKind) => void;
@@ -61,11 +63,15 @@ export const SiteEditor: Component<SiteEditorProps> = (props) => {
                 onInput={(event) => props.onPatternDraft(event.currentTarget.value)}
               />
               <Button
-                disabled={!canApply()}
-                title="Ask Chrome for access to the new domain"
-                onClick={() => props.onApplyPattern()}
+                disabled={!canApply() && !props.needsAccess}
+                title={
+                  canApply()
+                    ? 'Ask Chrome for access to the new domain'
+                    : 'Ask Chrome for access to this domain'
+                }
+                onClick={() => (canApply() ? props.onApplyPattern() : props.onGrantAccess())}
               >
-                Apply
+                {canApply() || !props.needsAccess ? 'Apply' : 'Grant access'}
               </Button>
             </div>
           </Field>
@@ -91,9 +97,11 @@ export const SiteEditor: Component<SiteEditorProps> = (props) => {
           <span class="switch-label">Show the card on this site</span>
         </label>
         <p class="hint">
-          {props.site.pattern === '*'
-            ? 'Applies to every site.'
-            : `Applies to ${props.site.pattern} and its subdomains.`}
+          {props.needsAccess
+            ? `Chrome access to ${props.site.pattern} was not granted, so no card shows there yet.`
+            : props.site.pattern === '*'
+              ? 'Applies to every site.'
+              : `Applies to ${props.site.pattern} and its subdomains.`}
         </p>
       </div>
 

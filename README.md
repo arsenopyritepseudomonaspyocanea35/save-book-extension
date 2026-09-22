@@ -14,6 +14,10 @@ the page. A small, draggable card shows your saved items on the sites you choose
 - **Appearance** overrides the theme for the settings page and for the card on every site — follow
   the system, or pin light or dark. **Data** clears all sites, all items, or everything, and hands
   back the Chrome access that went with those sites.
+- A card shows the items of **every site that matches the page** — its own site and any broader one,
+  `*` included. So an item kept on the `*` site appears everywhere the card runs, next to whatever
+  that page has of its own. Chrome access is per domain, so the `*` site needs the all-sites grant;
+  the settings page flags any site whose access was never granted and asks Chrome for it again.
 - On those sites, and only those, the card appears. Click a row to copy the value.
 - Drag the card wherever suits you. Position, collapsed state and visibility are remembered per site.
 - Everything is configured in the extension's settings page. Toggle the card from the toolbar icon.

@@ -4,7 +4,7 @@ import cardCss from './card.css?inline';
 import { Card } from './Card';
 import { itemTypes } from '../shared/itemTypes';
 import type { CardToBackground, BackgroundToCard } from '../shared/messages';
-import { findSite } from '../shared/pattern';
+import { itemsOn, matchingSites } from '../shared/pattern';
 import type { Item, Site, SiteUI, Theme } from '../shared/schema';
 import { onStoreChanged, patchSite, readStore } from '../shared/store';
 declare global {
@@ -61,15 +61,13 @@ async function boot(): Promise<void> {
   if (window.top !== window || document.getElementById(HOST_ID)) return;
 
   const store = await readStore();
-  const initial = findSite(store, location.hostname);
-  if (!initial) return;
+  const initial = matchingSites(store, location.hostname);
+  if (!initial.length) return;
   if (document.getElementById(HOST_ID)) return;
 
   const { host, shadow } = createHost();
-  const [site, setSite] = createSignal<Site | undefined>(initial);
-  const [items, setItems] = createSignal<Item[]>(
-    store.items.filter((item) => item.sites.includes(initial.id)),
-  );
+  const [site, setSite] = createSignal<Site | undefined>(initial[0]);
+  const [items, setItems] = createSignal<Item[]>(itemsOn(initial, store.items));
   const [theme, setTheme] = createSignal<Theme>(store.settings.theme);
   let dispose: (() => void) | undefined;
   let unsubscribe: (() => void) | undefined;
@@ -125,13 +123,13 @@ async function boot(): Promise<void> {
   );
 
   unsubscribe = onStoreChanged((changed) => {
-    const next = findSite(changed, location.hostname);
-    if (!next) {
+    const next = matchingSites(changed, location.hostname);
+    if (!next.length) {
       unmount();
       return;
     }
-    setSite(next);
-    setItems(changed.items.filter((item) => item.sites.includes(next.id)));
+    setSite(next[0]);
+    setItems(itemsOn(next, changed.items));
     setTheme(changed.settings.theme);
   });
 
