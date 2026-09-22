@@ -21,7 +21,7 @@ export const de: Dictionary = {
   'tabs.items': 'Einträge',
   'tabs.sites': 'Websites',
   'tabs.settings': 'Einstellungen',
-  'tabs.label': 'Bereiche der Einstellungen',
+  'tabs.label': 'Ansichten',
 
   'sites.addDomainLabel': 'Domain zum Hinzufügen',
   'sites.add': 'Hinzufügen',
@@ -127,6 +127,7 @@ export const de: Dictionary = {
   'card.empty': 'Keine Einträge',
   'card.addItems': 'Einträge hinzufügen',
 
+  'settings.nav': 'Bereiche der Einstellungen',
   'settings.appearance': 'Darstellung',
   'settings.language': 'Sprache',
   'settings.data': 'Daten',

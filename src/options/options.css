@@ -357,6 +357,11 @@ code {
   margin-top: 14px;
 }
 
+/* A settings panel is a jump target from the rail; keep .main's top padding above it. */
+.settings-section {
+  scroll-margin-top: 22px;
+}
+
 .fields {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);

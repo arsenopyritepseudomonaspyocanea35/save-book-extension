@@ -35,7 +35,7 @@ export function App() {
   const [view, setView] = createSignal<View>('items');
   const [selectedSiteId, setSelectedSiteId] = createSignal<string | null>(null);
   const [selectedItemId, setSelectedItemId] = createSignal<string | null>(null);
-  const [settingsSection, setSettingsSection] = createSignal<SettingsSection>('appearance');
+  const [settingsSection, setSettingsSection] = createSignal<SettingsSection | null>(null);
   const [patternDraft, setPatternDraft] = createSignal('');
   const [newPattern, setNewPattern] = createSignal('');
   const [filter, setFilter] = createSignal('');
@@ -605,18 +605,18 @@ export function App() {
               language={store.settings.language}
               siteCount={store.sites.length}
               itemCount={store.items.length}
-              onSelect={setSettingsSection}
             />
           </aside>
 
           <main class="main">
             <div class="editor">
               <SettingsEditor
-                section={settingsSection()}
+                visible={view() === 'settings'}
                 theme={store.settings.theme}
                 language={store.settings.language}
                 siteCount={store.sites.length}
                 itemCount={store.items.length}
+                onActive={setSettingsSection}
                 onTheme={setTheme}
                 onLanguage={changeLanguage}
                 onClearSites={() => void clearSites()}
