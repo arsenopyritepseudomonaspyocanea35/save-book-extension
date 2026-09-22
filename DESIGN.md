@@ -422,7 +422,8 @@ that needs less content.
 ## Layout
 
 The shell is a two-row grid: a 46px top bar over a `292px + 1fr` view. The bar holds the brand and
-the Sites/Items tab strip, with the tab underline sitting on the bar's own bottom hairline. The rail
+the Items/Sites tab strip — Items first, and the view the page opens on — with the tab underline
+sitting on the bar's own bottom hairline. The rail
 sits on `--surface` with a right hairline and scrolls independently; the editor sits on `--bg` with
 padding of 22px 26px 48px and a content cap of 860px so the form never stretches into a wide empty
 canvas. Both panes scroll inside a 100vh shell rather than the page scrolling.
@@ -450,7 +451,9 @@ of what its row happens to contain. The reveal slot and the stamp slot are rende
 whether or not there is an eye or a pill to put in them, and the editor's value field keeps the same
 28px for its reveal button whether the item is text or secret. The same field therefore lands on the
 same x and the same width in every row of a list — measured identical at 1440, 1280 and 1024, and
-identical per column at 390.
+identical per column at 390. A fixed column fixes where a control starts, not that it stretches: the
+kind column keeps its 128px while the segmented control inside it sizes to its own content
+(`justify-self: start`).
 
 The on-page card is not part of this grid. It is a fixed, absolutely-positioned 272px panel
 (dark or light by the page's scheme) clamped 12px from the viewport edges, moved with a transform
@@ -586,12 +589,15 @@ rather than an action.
 - **Top bar:** `--surface`, 1px bottom hairline, 46px tall, `0 16px` padding, 20px gap. It holds the
   brand (a 16px accent-coloured SVG mark, the only place the accent is used as a colour block, plus
   a 14px/600 wordmark) and the tab strip.
-- **Tabs:** a `role="tablist"` sitting on the bar's baseline. Each tab is `--muted` at 13px/520 with
-  `0 12px` padding, and carries its own count pill. Selection is announced three ways: `--fg` text,
-  `aria-selected`, and a 2px `--accent` underline inset 8px from each side and dropped 1px so it
-  sits *on* the bar's hairline rather than above it. Hover only shifts the text to `--fg`. Focus is
-  a 2px accent outline inset 3px. Arrow keys move selection and focus together; the strip is one
-  tab stop.
+- **Tabs:** a `role="tablist"` sitting on the bar's baseline, reading **Items then Sites**. Items is
+  the default view: the page opens on the shared pool, because that is where a value is entered once
+  and routed. The one thing that moves a user to Sites is the card's pending-domain path, which
+  switches the view and focuses the domain field for the `Add` the card just asked them to press.
+  Each tab is `--muted` at 13px/520 with `0 12px` padding, and carries its own count pill. Selection
+  is announced three ways: `--fg` text, `aria-selected`, and a 2px `--accent` underline inset 8px
+  from each side and dropped 1px so it sits *on* the bar's hairline rather than above it. Hover only
+  shifts the text to `--fg`. Focus is a 2px accent outline inset 3px. Arrow keys move selection and
+  focus together; the strip is one tab stop.
 - **Rail rows:** the index row, used by both tabs. The row is a single `<button>` — one object for
   hover, click and focus — laid out in a grid of `minmax(0,1fr) auto`, or
   `auto minmax(0,1fr) auto` on the Items tab where a 13px kind icon occupies the first column and
@@ -611,7 +617,8 @@ literal: an item's site rows reuse the rail's own title class rather than a copy
 
 - **A site's items (Sites tab panel):** a list of `.item` rows, each a single line built as a
   six-column grid — `128px minmax(0, 1fr) minmax(0, 1.15fr) 28px 74px 30px` at `gap: 8px` — holding,
-  in order, the `.kind-switch`, the `.item-label` input, the mono `.item-value` input, a
+  in order, the `.kind-switch` (start-aligned, so its track ends at the Password segment rather
+  than stretching across the 128px column), the `.item-label` input, the mono `.item-value` input, a
   `.field-actions` slot, a `.stamp-slot`, and the remove icon button (28px, `justify-self: end`).
   Two of those columns are slots rather than content: `.field-actions` carries the reveal eye only
   for a masked item, and `.stamp-slot` carries the `n sites` pill only for an item on more than one
@@ -639,6 +646,12 @@ buttons on a 2px-padded `--hover` wash with an 8px radius. The active button is 
 with a 6px radius, `--fg` text and a 1px soft lift; the inactive one is plain `--muted` text that
 goes `--fg` on hover. Focus is a 2px accent outline offset by 1px. It is a segmented control, not a
 toggle: both options are always visible, and each button is `aria-pressed`.
+
+The switch owns its width, not its column. Inside an item row it sits in a fixed 128px kind column
+but is `justify-self: start`, so the `--hover` track ends where the Password segment ends instead of
+running on as a bare grey strip to the column edge; the row's copy and the editor's copy therefore
+measure the same 119px, the 2px between the last segment and the track's edge being the control's own
+padding. A fixed column fixes where a control starts, not how wide it stretches.
 
 ### Toggle switch
 
