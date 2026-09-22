@@ -29,32 +29,31 @@ export const ItemList: Component<ItemListProps> = (props) => (
           <li
             class="rail-row rail-row-item"
             classList={{ on: item.id === props.selectedId, off: !item.sites.length }}
-            onClick={() => props.onSelect(item.id)}
           >
-            <span class="rail-mark" aria-hidden="true">
-              {item.type === 'secret' ? <LockIcon /> : <TextIcon />}
-            </span>
             <button
-              class="rail-title"
+              class="rail-open"
               type="button"
               aria-current={item.id === props.selectedId ? 'true' : undefined}
               onClick={() => props.onSelect(item.id)}
             >
-              {itemName(item)}
-            </button>
-            <span class="count">{item.sites.length}</span>
-            <span class="rail-sub">
-              <span class="rail-sub-text">
-                {!item.label && item.type !== 'secret'
-                  ? ''
-                  : item.type === 'secret'
-                    ? DOTS
-                    : item.value}
+              <span class="rail-mark" aria-hidden="true">
+                {item.type === 'secret' ? <LockIcon /> : <TextIcon />}
               </span>
-              <Show when={!item.sites.length}>
-                <span class="flag">not on any site</span>
-              </Show>
-            </span>
+              <span class="rail-title">{itemName(item)}</span>
+              <span class="count">{item.sites.length}</span>
+              <span class="rail-sub">
+                <span class="rail-sub-text">
+                  {!item.label && item.type !== 'secret'
+                    ? ''
+                    : item.type === 'secret'
+                      ? DOTS
+                      : item.value}
+                </span>
+                <Show when={!item.sites.length}>
+                  <span class="flag">not on any site</span>
+                </Show>
+              </span>
+            </button>
           </li>
         )}
       </For>

@@ -15,28 +15,24 @@ export const SiteList: Component<SiteListProps> = (props) => (
     <Show when={props.sites.length} fallback={<li class="rail-empty">No sites yet.</li>}>
       <For each={props.sites}>
         {(site) => (
-          <li
-            class="rail-row"
-            classList={{ on: site.id === props.selectedId, off: !site.enabled }}
-            onClick={() => props.onSelect(site.id)}
-          >
+          <li class="rail-row" classList={{ on: site.id === props.selectedId, off: !site.enabled }}>
             <button
-              class="rail-title"
+              class="rail-open"
               type="button"
               aria-current={site.id === props.selectedId ? 'true' : undefined}
               onClick={() => props.onSelect(site.id)}
             >
-              {siteName(site)}
-            </button>
-            <span class="count">{props.counts[site.id] ?? 0}</span>
-            <span class="rail-sub">
-              <span class="rail-sub-text">
-                {site.label ? site.pattern : site.pattern === '*' ? 'every site' : ''}
+              <span class="rail-title">{siteName(site)}</span>
+              <span class="count">{props.counts[site.id] ?? 0}</span>
+              <span class="rail-sub">
+                <span class="rail-sub-text">
+                  {site.label ? site.pattern : site.pattern === '*' ? 'every site' : ''}
+                </span>
+                <Show when={!site.enabled}>
+                  <span class="flag">card off</span>
+                </Show>
               </span>
-              <Show when={!site.enabled}>
-                <span class="flag">card off</span>
-              </Show>
-            </span>
+            </button>
           </li>
         )}
       </For>

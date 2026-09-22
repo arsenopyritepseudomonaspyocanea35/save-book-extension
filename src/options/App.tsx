@@ -371,7 +371,7 @@ export function App() {
                   when={selectedSite()}
                   fallback={
                     <div class="placeholder">
-                      <h1>{store.sites.length ? 'Nothing selected' : 'Add your first site'}</h1>
+                      <h2>{store.sites.length ? 'Nothing selected' : 'Add your first site'}</h2>
                       <p>
                         Type a domain in the sidebar — for example example.com — and Save Book asks
                         Chrome for access to just that domain. Then add the logins, numbers or
@@ -460,7 +460,7 @@ export function App() {
                   when={selectedItem()}
                   fallback={
                     <div class="placeholder">
-                      <h1>No items yet</h1>
+                      <h2>No items yet</h2>
                       <p>
                         Add a login, a code or a number from the sidebar, then choose the sites it
                         belongs on. The same value then shows on each of those site's cards — you

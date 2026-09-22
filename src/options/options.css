@@ -213,28 +213,39 @@ code {
 }
 
 .rail-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 1px 8px;
-  align-items: center;
-  padding: 7px 9px;
   border-radius: var(--radius-md);
-  cursor: pointer;
 }
 
 .rail-row-item {
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  --rail-columns: auto minmax(0, 1fr) auto;
 }
 
-.rail-row:hover {
+/* The whole row is one button: hovering, clicking and focusing all agree on it. */
+.rail-open {
+  display: grid;
+  grid-template-columns: var(--rail-columns, minmax(0, 1fr) auto);
+  gap: 1px 8px;
+  align-items: center;
+  width: 100%;
+  padding: 7px 9px;
+  color: inherit;
+  background: none;
+  border: 0;
+  border-radius: var(--radius-md);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rail-open:hover {
   background: var(--hover);
 }
 
-.rail-row.on {
+.rail-row.on .rail-open {
   background: color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
-.rail-row:focus-visible {
+.rail-open:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: -2px;
 }
@@ -536,7 +547,7 @@ code {
   padding: 36px 0;
 }
 
-.placeholder h1 {
+.placeholder h2 {
   margin: 0 0 8px;
   font-size: 19px;
   font-weight: 600;
