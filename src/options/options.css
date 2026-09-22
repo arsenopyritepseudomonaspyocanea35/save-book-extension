@@ -79,6 +79,10 @@ textarea {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.brand-name {
+  margin: 0;
   font-size: 14px;
   font-weight: 600;
   letter-spacing: -0.01em;
@@ -152,6 +156,13 @@ select:focus-visible {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 6px;
+}
+
+/* A stored value or a host pattern is data, and reads as data on both sides of the product. */
+input.input-mono,
+.value-wrap input {
+  font-family: var(--mono);
+  font-size: 12.5px;
 }
 
 .kinds {
@@ -229,8 +240,8 @@ code {
 }
 
 .rail-row.off .rail-title,
-.rail-row.off .rail-sub {
-  opacity: 0.5;
+.site-row.off .rail-title {
+  color: var(--muted);
 }
 
 .rail-mark {
@@ -243,10 +254,23 @@ code {
 .rail-title {
   grid-column: 1;
   overflow: hidden;
+  padding: 0;
+  color: inherit;
+  background: none;
+  border: 0;
+  font: inherit;
   font-size: 13px;
   font-weight: 550;
+  text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;
+  cursor: pointer;
+}
+
+.rail-title:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
 }
 
 .rail-row-item .rail-title {
@@ -254,12 +278,31 @@ code {
 }
 
 .rail-sub {
+  display: flex;
   grid-column: 1 / -1;
-  overflow: hidden;
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
   color: var(--muted);
   font-family: var(--mono);
   font-size: 11px;
+}
+
+.rail-sub-text {
+  overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.flag {
+  flex: 0 0 auto;
+  padding: 1px 6px;
+  color: var(--muted);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  font-family: var(--font);
+  font-size: 10.5px;
+  line-height: 1.5;
   white-space: nowrap;
 }
 
@@ -527,18 +570,9 @@ code {
   cursor: pointer;
 }
 
-.site-row:hover {
+.site-row:hover,
+.site-row:focus-within {
   background: var(--hover);
-}
-
-.site-row:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: -2px;
-}
-
-.site-row.off .rail-title,
-.site-row.off .rail-sub {
-  opacity: 0.5;
 }
 
 .site-row .icon-button {

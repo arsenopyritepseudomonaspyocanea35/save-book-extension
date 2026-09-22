@@ -14,31 +14,31 @@ export const SiteList: Component<SiteListProps> = (props) => (
   <ul class="rail-list">
     <Show when={props.sites.length} fallback={<li class="rail-empty">No sites yet.</li>}>
       <For each={props.sites}>
-        {(site) => {
-          const count = () => props.counts[site.id] ?? 0;
-          const select = () => props.onSelect(site.id);
-          return (
-            <li
-              class="rail-row"
-              classList={{ on: site.id === props.selectedId, off: !site.enabled }}
-              role="button"
-              tabindex="0"
+        {(site) => (
+          <li
+            class="rail-row"
+            classList={{ on: site.id === props.selectedId, off: !site.enabled }}
+            onClick={() => props.onSelect(site.id)}
+          >
+            <button
+              class="rail-title"
+              type="button"
               aria-current={site.id === props.selectedId ? 'true' : undefined}
-              onClick={select}
-              onKeyDown={(event) => {
-                if (event.key !== 'Enter' && event.key !== ' ') return;
-                event.preventDefault();
-                select();
-              }}
+              onClick={() => props.onSelect(site.id)}
             >
-              <span class="rail-title">{siteName(site)}</span>
-              <span class="count">{count()}</span>
-              <span class="rail-sub">
+              {siteName(site)}
+            </button>
+            <span class="count">{props.counts[site.id] ?? 0}</span>
+            <span class="rail-sub">
+              <span class="rail-sub-text">
                 {site.label ? site.pattern : site.pattern === '*' ? 'every site' : ''}
               </span>
-            </li>
-          );
-        }}
+              <Show when={!site.enabled}>
+                <span class="flag">card off</span>
+              </Show>
+            </span>
+          </li>
+        )}
       </For>
     </Show>
   </ul>

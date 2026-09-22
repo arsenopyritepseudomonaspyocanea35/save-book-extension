@@ -220,7 +220,7 @@ export function App() {
       rest.length
         ? `${itemName(item)} is off ${siteName(site)} — still shown on ${rest.length} other ${rest.length === 1 ? 'site' : 'sites'
         }.`
-        : `${itemName(item)} is on no site now, so no card shows it.`,
+        : `${itemName(item)} is not on any site now, so no card shows it.`,
     );
   };
 
@@ -314,7 +314,7 @@ export function App() {
                 </g>
               </svg>
             </span>
-            <span class="brand-name">Save Book</span>
+            <h1 class="brand-name">Save Book</h1>
           </div>
           <Tabs label="Settings sections" tabs={tabs()} value={view()} onChange={changeView} />
         </header>
@@ -337,6 +337,7 @@ export function App() {
             >
               <input
                 ref={patternInput}
+                class="input-mono"
                 type="text"
                 placeholder="example.com"
                 spellcheck={false}
@@ -353,12 +354,14 @@ export function App() {
               Cards appear on that domain and its subdomains. Use <code>*</code> for every site.
             </p>
 
-            <SiteList
-              sites={store.sites}
-              counts={siteCounts()}
-              selectedId={selectedSiteId()}
-              onSelect={setSelectedSiteId}
-            />
+            <Show when={loaded()}>
+              <SiteList
+                sites={store.sites}
+                counts={siteCounts()}
+                selectedId={selectedSiteId()}
+                onSelect={setSelectedSiteId}
+              />
+            </Show>
           </aside>
 
           <main class="main">

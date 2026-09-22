@@ -25,35 +25,38 @@ export const ItemList: Component<ItemListProps> = (props) => (
       }
     >
       <For each={props.items}>
-        {(item) => {
-          const select = () => props.onSelect(item.id);
-          const subtitle = () => {
-            if (!item.label && item.type !== 'secret') return '';
-            return item.type === 'secret' ? DOTS : item.value;
-          };
-          return (
-            <li
-              class="rail-row rail-row-item"
-              classList={{ on: item.id === props.selectedId, off: !item.sites.length }}
-              role="button"
-              tabindex="0"
+        {(item) => (
+          <li
+            class="rail-row rail-row-item"
+            classList={{ on: item.id === props.selectedId, off: !item.sites.length }}
+            onClick={() => props.onSelect(item.id)}
+          >
+            <span class="rail-mark" aria-hidden="true">
+              {item.type === 'secret' ? <LockIcon /> : <TextIcon />}
+            </span>
+            <button
+              class="rail-title"
+              type="button"
               aria-current={item.id === props.selectedId ? 'true' : undefined}
-              onClick={select}
-              onKeyDown={(event) => {
-                if (event.key !== 'Enter' && event.key !== ' ') return;
-                event.preventDefault();
-                select();
-              }}
+              onClick={() => props.onSelect(item.id)}
             >
-              <span class="rail-mark" aria-hidden="true">
-                {item.type === 'secret' ? <LockIcon /> : <TextIcon />}
+              {itemName(item)}
+            </button>
+            <span class="count">{item.sites.length}</span>
+            <span class="rail-sub">
+              <span class="rail-sub-text">
+                {!item.label && item.type !== 'secret'
+                  ? ''
+                  : item.type === 'secret'
+                    ? DOTS
+                    : item.value}
               </span>
-              <span class="rail-title">{itemName(item)}</span>
-              <span class="count">{item.sites.length}</span>
-              <span class="rail-sub">{subtitle()}</span>
-            </li>
-          );
-        }}
+              <Show when={!item.sites.length}>
+                <span class="flag">not on any site</span>
+              </Show>
+            </span>
+          </li>
+        )}
       </For>
     </Show>
   </ul>

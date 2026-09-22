@@ -55,6 +55,7 @@ export const SiteEditor: Component<SiteEditorProps> = (props) => {
           <Field label="Domain">
             <div class="field-row">
               <input
+                class="input-mono"
                 type="text"
                 spellcheck={false}
                 autocomplete="off"
