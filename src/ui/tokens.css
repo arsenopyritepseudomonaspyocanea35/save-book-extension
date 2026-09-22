@@ -32,8 +32,6 @@
   );
 }
 
-/* Theme override. With no attribute the element follows the system; `data-theme` pins one
-   scheme. Every colour above is a `light-dark()` pair, so both surfaces read one sheet. */
 :root[data-theme='light'],
 .ui-tokens[data-theme='light'] {
   color-scheme: light;
