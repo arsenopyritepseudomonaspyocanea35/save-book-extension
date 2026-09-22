@@ -160,7 +160,8 @@ select:focus-visible {
 
 /* A stored value or a host pattern is data, and reads as data on both sides of the product. */
 input.input-mono,
-.value-wrap input {
+.value-wrap input,
+.item > .item-value {
   font-family: var(--mono);
   font-size: 12.5px;
 }
@@ -491,34 +492,31 @@ code {
   font-weight: 600;
 }
 
+/* Every cell is its own column, so the same field lands in the same place in every row. */
 .item {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 128px minmax(0, 1fr) minmax(0, 1.15fr) 28px 74px 30px;
   gap: 8px;
   align-items: center;
 }
 
-.item > .kind-switch {
-  flex: 0 0 auto;
+.item .icon-button {
+  --icon-button-size: 28px;
 }
 
-.item > input[data-label-for] {
-  flex: 1 1 150px;
+.item-actions,
+.stamp-slot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.item > .stamp-slot {
   min-width: 0;
-}
-
-.item > .value-wrap {
-  flex: 1.4 1 190px;
-  min-width: 0;
-}
-
-.item > .stamp {
-  flex: 0 0 auto;
 }
 
 .item > .icon-button {
-  margin-left: auto;
-  --icon-button-size: 30px;
+  justify-self: end;
 }
 
 .value-wrap {
@@ -691,5 +689,40 @@ code {
 
   .fields {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Two columns of cells reflow onto three lines but keep one column per field. */
+  .item {
+    grid-template-columns: 118px minmax(0, 1fr) 28px;
+    grid-template-areas:
+      'kind label label'
+      'value value reveal'
+      'stamp stamp remove';
+    row-gap: 6px;
+  }
+
+  .item > .kind-switch {
+    grid-area: kind;
+  }
+
+  .item > .item-label {
+    grid-area: label;
+  }
+
+  .item > .item-value {
+    grid-area: value;
+  }
+
+  .item > .item-actions {
+    grid-area: reveal;
+  }
+
+  .item > .stamp-slot {
+    grid-area: stamp;
+    justify-content: flex-start;
+  }
+
+  .item > .icon-button {
+    grid-area: remove;
   }
 }
