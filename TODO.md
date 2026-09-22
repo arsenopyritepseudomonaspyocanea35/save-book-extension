@@ -1,2 +1,1 @@
-- Add translations
 - Add proper "Settings" tab

@@ -1,0 +1,10 @@
+{
+  "extDescription": {
+    "message": "Guarda los inicios de sesión, los números y las notas que necesitas justo al lado de los sitios donde los usas.",
+    "description": "The extension's one-line description, shown by Chrome."
+  },
+  "actionTitle": {
+    "message": "Save Book — mostrar u ocultar la tarjeta en este sitio",
+    "description": "Tooltip on the toolbar button."
+  }
+}

@@ -1,5 +1,6 @@
 import { For, Show, type Component } from 'solid-js';
 import { LockIcon, TextIcon } from '../ui/icons/icons';
+import { t } from '../shared/i18n';
 import { itemName } from '../shared/naming';
 import type { Item } from '../shared/schema';
 
@@ -18,7 +19,7 @@ export const ItemList: Component<ItemListProps> = (props) => (
       when={props.items.length}
       fallback={
         <li class="rail-empty">
-          {props.total ? 'No item matches that filter.' : 'No items yet — add one above.'}
+          {t(props.total ? 'items.list.noMatch' : 'items.list.empty')}
         </li>
       }
     >
@@ -48,7 +49,7 @@ export const ItemList: Component<ItemListProps> = (props) => (
                       : item.value}
                 </span>
                 <Show when={!item.sites.length}>
-                  <span class="flag">not on any site</span>
+                  <span class="flag">{t('items.list.notOnAnySite')}</span>
                 </Show>
               </span>
             </button>

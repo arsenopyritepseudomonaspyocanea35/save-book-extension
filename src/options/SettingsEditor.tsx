@@ -2,20 +2,28 @@ import { Show, createSignal, onCleanup, onMount, type Component } from 'solid-js
 import { Button } from '../ui/button/button';
 import { Segmented, type SegmentedOption } from '../ui/segmented/segmented';
 import type { SettingsSection } from './SettingsList';
-import type { Theme } from '../shared/schema';
+import { LOCALE_NAMES, locale, t } from '../shared/i18n';
+import { LOCALES, type Language, type Theme } from '../shared/schema';
 
-const THEME_OPTIONS: SegmentedOption<Theme>[] = [
-  { value: 'system', label: 'System' },
-  { value: 'light', label: 'Light' },
-  { value: 'dark', label: 'Dark' },
+const themeOptions = (): SegmentedOption<Theme>[] => [
+  { value: 'system', label: t('common.system') },
+  { value: 'light', label: t('settings.theme.light') },
+  { value: 'dark', label: t('settings.theme.dark') },
+];
+
+const languageOptions = (): SegmentedOption<Language>[] => [
+  { value: 'system', label: t('common.system') },
+  ...LOCALES.map((code) => ({ value: code, label: LOCALE_NAMES[code] })),
 ];
 
 export interface SettingsEditorProps {
   section: SettingsSection;
   theme: Theme;
+  language: Language;
   siteCount: number;
   itemCount: number;
   onTheme: (theme: Theme) => void;
+  onLanguage: (language: Language) => void;
   onClearSites: () => void;
   onClearItems: () => void;
   onClearEverything: () => void;
@@ -77,8 +85,13 @@ export const SettingsEditor: Component<SettingsEditorProps> = (props) => {
 
   const themeNote = () =>
     props.theme === 'system'
-      ? `Follows your system, which is ${systemTheme()} right now. Applies to this page and to the card on every site you have.`
-      : `Always ${props.theme}, whatever your system says. Applies to this page and to the card on every site you have.`;
+      ? t('settings.theme.noteSystem', systemTheme())
+      : t('settings.theme.noteFixed', props.theme);
+
+  const languageNote = () =>
+    props.language === 'system'
+      ? t('settings.language.noteSystem', locale())
+      : t('settings.language.noteFixed', locale());
 
   return (
     <>
@@ -87,14 +100,33 @@ export const SettingsEditor: Component<SettingsEditorProps> = (props) => {
           <ul class="setting-rows">
             <li class="setting-row">
               <span class="setting-text">
-                <span class="setting-title">Theme</span>
+                <span class="setting-title">{t('settings.theme.title')}</span>
                 <span class="setting-note">{themeNote()}</span>
               </span>
               <Segmented
-                label="Theme"
-                options={THEME_OPTIONS}
+                label={t('settings.theme.group')}
+                options={themeOptions()}
                 value={props.theme}
                 onChange={(theme) => props.onTheme(theme)}
+              />
+            </li>
+          </ul>
+        </div>
+      </Show>
+
+      <Show when={props.section === 'language'}>
+        <div class="panel">
+          <ul class="setting-rows">
+            <li class="setting-row">
+              <span class="setting-text">
+                <span class="setting-title">{t('settings.language')}</span>
+                <span class="setting-note">{languageNote()}</span>
+              </span>
+              <Segmented
+                label={t('settings.language.group')}
+                options={languageOptions()}
+                value={props.language}
+                onChange={(language) => props.onLanguage(language)}
               />
             </li>
           </ul>
@@ -104,37 +136,34 @@ export const SettingsEditor: Component<SettingsEditorProps> = (props) => {
       <Show when={props.section === 'data'}>
         <div class="panel">
           <div class="section-head">
-            <h2>Clear data</h2>
+            <h2>{t('settings.data.title')}</h2>
           </div>
-          <p class="hint section-note">
-            Everything Save Book keeps is in this browser and nowhere else, so clearing cannot be
-            undone. Your theme choice is not data and stays.
-          </p>
+          <p class="hint section-note">{t('settings.data.note')}</p>
 
           <ul class="setting-rows">
             <ClearRow
-              title="Sites"
+              title={t('settings.data.sites')}
               count={props.siteCount}
-              note="Removes every site and hands its Chrome access back. Items are kept — no site shows them."
-              label="Clear sites"
-              armedLabel="Click again to clear"
+              note={t('settings.data.sitesNote')}
+              label={t('settings.data.sitesLabel')}
+              armedLabel={t('settings.data.sitesArmed')}
               disabled={props.siteCount === 0}
               onClear={props.onClearSites}
             />
             <ClearRow
-              title="Items"
+              title={t('settings.data.items')}
               count={props.itemCount}
-              note="Deletes every saved value, on every site. Sites and card positions stay."
-              label="Clear items"
-              armedLabel="Click again to clear"
+              note={t('settings.data.itemsNote')}
+              label={t('settings.data.itemsLabel')}
+              armedLabel={t('settings.data.sitesArmed')}
               disabled={props.itemCount === 0}
               onClear={props.onClearItems}
             />
             <ClearRow
-              title="Everything"
-              note="Removes every site, every item and every saved card position, and hands the Chrome access back."
-              label="Clear everything"
-              armedLabel="Click again to clear everything"
+              title={t('settings.data.everything')}
+              note={t('settings.data.everythingNote')}
+              label={t('settings.data.everythingLabel')}
+              armedLabel={t('settings.data.everythingArmed')}
               disabled={props.siteCount === 0 && props.itemCount === 0}
               onClear={props.onClearEverything}
             />

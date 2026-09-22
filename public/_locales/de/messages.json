@@ -1,0 +1,10 @@
+{
+  "extDescription": {
+    "message": "Behalte die Logins, Nummern und Notizen, die du brauchst, direkt neben den Websites, auf denen du sie brauchst.",
+    "description": "The extension's one-line description, shown by Chrome."
+  },
+  "actionTitle": {
+    "message": "Save Book — Karte auf dieser Website ein- oder ausblenden",
+    "description": "Tooltip on the toolbar button."
+  }
+}

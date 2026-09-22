@@ -2,6 +2,7 @@ import { Show, createSignal } from 'solid-js';
 import { render } from 'solid-js/web';
 import cardCss from './card.css?inline';
 import { Card } from './Card';
+import { setLanguage } from '../shared/i18n';
 import { itemTypes } from '../shared/itemTypes';
 import type { CardToBackground, BackgroundToCard } from '../shared/messages';
 import { itemsOn, matchingSites } from '../shared/pattern';
@@ -61,6 +62,7 @@ async function boot(): Promise<void> {
   if (window.top !== window || document.getElementById(HOST_ID)) return;
 
   const store = await readStore();
+  setLanguage(store.settings.language);
   const initial = matchingSites(store, location.hostname);
   if (!initial.length) return;
   if (document.getElementById(HOST_ID)) return;
@@ -128,6 +130,7 @@ async function boot(): Promise<void> {
       unmount();
       return;
     }
+    setLanguage(changed.settings.language);
     setSite(next[0]);
     setItems(itemsOn(next, changed.items));
     setTheme(changed.settings.theme);

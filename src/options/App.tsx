@@ -18,11 +18,13 @@ import {
   emptyStore,
   type Item,
   type ItemKind,
+  type Language,
   type Site,
   type Store,
   type Theme,
 } from '../shared/schema';
 import { readStore, writeStore } from '../shared/store';
+import { locale, setLanguage, t } from '../shared/i18n';
 
 type View = 'sites' | 'items' | 'settings';
 type ToastKind = 'info' | 'error';
@@ -59,6 +61,12 @@ export function App() {
     const theme = store.settings.theme;
     if (theme === 'system') document.documentElement.removeAttribute('data-theme');
     else document.documentElement.dataset.theme = theme;
+  });
+
+  createEffect(() => setLanguage(store.settings.language));
+
+  createEffect(() => {
+    document.documentElement.lang = locale();
   });
 
   const flushWrite = async () => {
@@ -149,25 +157,25 @@ export function App() {
     }
     await refreshAccess();
     if (!granted) {
-      notify(`Chrome access to ${site.pattern} was not granted, so no card shows there`, 'error');
+      notify(t('toast.accessMissing', site.pattern), 'error');
     }
   };
 
   const addSite = async (raw: string) => {
     const pattern = parsePattern(raw);
     if (!pattern) {
-      notify('Enter a domain like example.com, or * for every site', 'error');
+      notify(t('toast.badDomain'), 'error');
       return;
     }
     const existing = store.sites.find((site) => site.pattern === pattern);
     if (existing) {
       setSelectedSiteId(existing.id);
-      notify('That site is already here');
+      notify(t('toast.siteExists'));
       return;
     }
     const origins = originsFor(pattern);
     if (!(await chrome.permissions.request({ origins }).catch(() => false))) {
-      notify(`Chrome access to ${pattern} was not granted`, 'error');
+      notify(t('toast.accessDenied', pattern), 'error');
       return;
     }
     const site = createSite(pattern, origins);
@@ -176,24 +184,24 @@ export function App() {
     await persistNow();
     void refreshAccess();
     setNewPattern('');
-    notify(`Added ${pattern}. Reload that site to see the card.`);
+    notify(t('toast.siteAdded', pattern));
   };
 
   const changePattern = async (site: Site, raw: string) => {
     const pattern = parsePattern(raw);
     if (!pattern) {
-      notify('Enter a domain like example.com, or * for every site', 'error');
+      notify(t('toast.badDomain'), 'error');
       setPatternDraft(site.pattern);
       return;
     }
     if (pattern === site.pattern) return;
     if (store.sites.some((candidate) => candidate.id !== site.id && candidate.pattern === pattern)) {
-      notify(`Another site already uses ${pattern}`, 'error');
+      notify(t('toast.siteTaken', pattern), 'error');
       setPatternDraft(site.pattern);
       return;
     }
     if (!(await chrome.permissions.request({ origins: originsFor(pattern) }).catch(() => false))) {
-      notify(`Chrome access to ${pattern} was not granted`, 'error');
+      notify(t('toast.accessDenied', pattern), 'error');
       setPatternDraft(site.pattern);
       return;
     }
@@ -205,7 +213,7 @@ export function App() {
     await persistNow();
     await dropOrigins(previous);
     await refreshAccess();
-    notify('Domain updated. Reload that site to see the card.');
+    notify(t('toast.siteUpdated'));
   };
 
   const deleteSite = async (site: Site) => {
@@ -223,7 +231,7 @@ export function App() {
     await persistNow();
     await dropOrigins(origins);
     await refreshAccess();
-    notify(`Removed ${site.pattern}. Anything saved only there is now in “Not on any site”.`);
+    notify(t('toast.siteRemoved', site.pattern));
   };
 
   const setEnabled = (site: Site, enabled: boolean) => {
@@ -240,7 +248,7 @@ export function App() {
     touchedUi.add(site.id);
     setStore('sites', index, 'ui', { x: null, y: null, collapsed: false, hidden: false });
     void persistNow();
-    notify('The card will show up again, top right.');
+    notify(t('toast.cardReset'));
   };
 
   const assign = (item: Item, siteId: string) => {
@@ -251,8 +259,8 @@ export function App() {
     void persistNow();
     notify(
       site.enabled
-        ? `${itemName(item)} now shows on ${siteName(site)}.`
-        : `${itemName(item)} is added to ${siteName(site)}, but the card is off there.`,
+        ? t('toast.itemAssigned', itemName(item), siteName(site))
+        : t('toast.itemAssignedCardOff', itemName(item), siteName(site)),
     );
   };
 
@@ -265,9 +273,8 @@ export function App() {
     void persistNow();
     notify(
       rest.length
-        ? `${itemName(item)} is off ${siteName(site)} — still shown on ${rest.length} other ${rest.length === 1 ? 'site' : 'sites'
-        }.`
-        : `${itemName(item)} is not on any site now, so no card shows it.`,
+        ? t('toast.itemUnassigned', itemName(item), siteName(site), rest.length)
+        : t('toast.itemUnassignedLast', itemName(item)),
     );
   };
 
@@ -309,11 +316,16 @@ export function App() {
     setStore('items', rest);
     if (selectedItemId() === item.id) setSelectedItemId(rest[0]?.id ?? null);
     void persistNow();
-    notify(`${itemName(item)} deleted, on every site.`);
+    notify(t('toast.itemDeleted', itemName(item)));
   };
 
   const setTheme = (theme: Theme) => {
     setStore('settings', 'theme', theme);
+    void persistNow();
+  };
+
+  const changeLanguage = (language: Language) => {
+    setStore('settings', 'language', language);
     void persistNow();
   };
 
@@ -326,9 +338,7 @@ export function App() {
     setSelectedSiteId(null);
     await persistNow();
     await dropOrigins(origins);
-    notify(
-      `Removed ${count} ${count === 1 ? 'site' : 'sites'}. Chrome access was handed back; every item is now in “Not on any site”.`,
-    );
+    notify(t('toast.sitesCleared', count));
   };
 
   const clearItems = async () => {
@@ -337,9 +347,7 @@ export function App() {
     setStore('items', []);
     setSelectedItemId(null);
     await persistNow();
-    notify(
-      `Deleted ${count} ${count === 1 ? 'item' : 'items'}. Sites and card positions are untouched.`,
-    );
+    notify(t('toast.itemsCleared', count));
   };
 
   const clearEverything = async () => {
@@ -353,10 +361,7 @@ export function App() {
     setSelectedItemId(null);
     await persistNow();
     await dropOrigins(origins);
-    notify(
-      `Cleared ${sites} ${sites === 1 ? 'site' : 'sites'} and ${items} ${items === 1 ? 'item' : 'items'
-      }, plus every card position. Chrome access was handed back.`,
-    );
+    notify(t('toast.allCleared', sites, items));
   };
 
   const openSite = (siteId: string) => {
@@ -370,9 +375,9 @@ export function App() {
   };
 
   const tabs = createMemo<TabDefinition<View>[]>(() => [
-    { id: 'items', label: 'Items', count: store.items.length },
-    { id: 'sites', label: 'Sites', count: store.sites.length },
-    { id: 'settings', label: 'Settings' },
+    { id: 'items', label: t('tabs.items'), count: store.items.length },
+    { id: 'sites', label: t('tabs.sites'), count: store.sites.length },
+    { id: 'settings', label: t('tabs.settings') },
   ]);
 
   onMount(async () => {
@@ -392,7 +397,7 @@ export function App() {
       if (!pattern) return;
       setNewPattern(pattern);
       setView('sites');
-      notify(`Press Add to give Save Book access to ${pattern}.`);
+      notify(t('toast.pendingAccess', pattern));
       requestAnimationFrame(() => patternInput?.focus());
     } catch { }
   });
@@ -420,7 +425,7 @@ export function App() {
             </span>
             <h1 class="brand-name">Save Book</h1>
           </div>
-          <Tabs label="Settings sections" tabs={tabs()} value={view()} onChange={changeView} />
+          <Tabs label={t('tabs.label')} tabs={tabs()} value={view()} onChange={changeView} />
         </header>
 
         <div
@@ -445,18 +450,16 @@ export function App() {
                 type="text"
                 placeholder="example.com"
                 spellcheck={false}
-                aria-label="Domain to add"
+                aria-label={t('sites.addDomainLabel')}
                 value={newPattern()}
                 onInput={(event) => setNewPattern(event.currentTarget.value)}
               />
               <Button variant="primary" type="submit">
-                Add
+                {t('sites.add')}
               </Button>
             </form>
 
-            <p class="note">
-              Cards appear on that domain and its subdomains. Use <code>*</code> for every site.
-            </p>
+            <p class="note">{t('sites.note')}</p>
 
             <Show when={loaded()}>
               <SiteList
@@ -476,12 +479,10 @@ export function App() {
                   when={selectedSite()}
                   fallback={
                     <div class="placeholder">
-                      <h2>{store.sites.length ? 'Nothing selected' : 'Add your first site'}</h2>
-                      <p>
-                        Type a domain in the sidebar — for example example.com — and Save Book asks
-                        Chrome for access to just that domain. Then add the logins, numbers or
-                        snippets you want one click away there.
-                      </p>
+                      <h2>
+                        {store.sites.length ? t('sites.emptySelected') : t('sites.emptyFirst')}
+                      </h2>
+                      <p>{t('sites.emptyBody')}</p>
                     </div>
                   }
                 >
@@ -530,7 +531,7 @@ export function App() {
                 {(definition) => (
                   <Button variant="ghost" onClick={() => addItem(definition.kind, [])}>
                     <PlusIcon />
-                    {definition.label}
+                    {t(definition.labelKey)}
                   </Button>
                 )}
               </For>
@@ -539,8 +540,8 @@ export function App() {
             <input
               class="filter"
               type="search"
-              placeholder="Filter items"
-              aria-label="Filter items"
+              placeholder={t('items.filterPlaceholder')}
+              aria-label={t('items.filterLabel')}
               spellcheck={false}
               value={filter()}
               onInput={(event) => setFilter(event.currentTarget.value)}
@@ -555,9 +556,7 @@ export function App() {
               />
             </Show>
 
-            <p class="note">
-              One item, many sites: a value is stored once and shown on every site you add it to.
-            </p>
+            <p class="note">{t('items.note')}</p>
           </aside>
 
           <main class="main">
@@ -567,12 +566,8 @@ export function App() {
                   when={selectedItem()}
                   fallback={
                     <div class="placeholder">
-                      <h2>No items yet</h2>
-                      <p>
-                        Add a login, a code or a number from the sidebar, then choose the sites it
-                        belongs on. The same value then shows on each of those site's cards — you
-                        never re-type it.
-                      </p>
+                      <h2>{t('items.emptyFirst')}</h2>
+                      <p>{t('items.emptyBody')}</p>
                     </div>
                   }
                 >
@@ -607,6 +602,7 @@ export function App() {
             <SettingsList
               active={settingsSection()}
               theme={store.settings.theme}
+              language={store.settings.language}
               siteCount={store.sites.length}
               itemCount={store.items.length}
               onSelect={setSettingsSection}
@@ -618,9 +614,11 @@ export function App() {
               <SettingsEditor
                 section={settingsSection()}
                 theme={store.settings.theme}
+                language={store.settings.language}
                 siteCount={store.sites.length}
                 itemCount={store.items.length}
                 onTheme={setTheme}
+                onLanguage={changeLanguage}
                 onClearSites={() => void clearSites()}
                 onClearItems={() => void clearItems()}
                 onClearEverything={() => void clearEverything()}

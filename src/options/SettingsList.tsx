@@ -1,7 +1,8 @@
 import { For, createMemo, type Component } from 'solid-js';
-import type { Theme } from '../shared/schema';
+import { LOCALE_NAMES, locale, t } from '../shared/i18n';
+import type { Language, Theme } from '../shared/schema';
 
-export type SettingsSection = 'appearance' | 'data';
+export type SettingsSection = 'appearance' | 'language' | 'data';
 
 export interface SettingsEntry {
   id: SettingsSection;
@@ -12,18 +13,25 @@ export interface SettingsEntry {
 export interface SettingsListProps {
   active: SettingsSection;
   theme: Theme;
+  language: Language;
   siteCount: number;
   itemCount: number;
   onSelect: (id: SettingsSection) => void;
 }
 
 export const SettingsList: Component<SettingsListProps> = (props) => {
+  const languageReading = () =>
+    props.language === 'system'
+      ? `${t('common.system')} · ${LOCALE_NAMES[locale()]}`
+      : LOCALE_NAMES[locale()];
+
   const entries = createMemo<SettingsEntry[]>(() => {
-    const sites = `${props.siteCount} ${props.siteCount === 1 ? 'site' : 'sites'}`;
-    const items = `${props.itemCount} ${props.itemCount === 1 ? 'item' : 'items'}`;
+    const sites = t('count.sites', props.siteCount);
+    const items = t('count.items', props.itemCount);
     return [
-      { id: 'appearance', label: 'Appearance', reading: props.theme },
-      { id: 'data', label: 'Data', reading: `${sites} · ${items}` },
+      { id: 'appearance', label: t('settings.appearance'), reading: props.theme },
+      { id: 'language', label: t('settings.language'), reading: languageReading() },
+      { id: 'data', label: t('settings.data'), reading: `${sites} · ${items}` },
     ];
   });
 

@@ -13,6 +13,13 @@ export const THEMES = ['system', 'light', 'dark'] as const;
 export const ThemeSchema = v.picklist(THEMES);
 export type Theme = v.InferOutput<typeof ThemeSchema>;
 
+export const LOCALES = ['en', 'pl', 'es', 'fr', 'de'] as const;
+export type Locale = (typeof LOCALES)[number];
+
+export const LANGUAGES = ['system', ...LOCALES] as const;
+export const LanguageSchema = v.picklist(LANGUAGES);
+export type Language = v.InferOutput<typeof LanguageSchema>;
+
 const ItemSchema = v.object({
  id: v.fallback(v.pipe(v.string(), v.minLength(1)), () => crypto.randomUUID()),
  type: v.fallback(ItemKindSchema, 'text'),
@@ -41,6 +48,7 @@ const SiteSchema = v.object({
 
 const SettingsSchema = v.object({
  theme: v.fallback(ThemeSchema, 'system'),
+ language: v.fallback(LanguageSchema, 'system'),
 });
 
 const StoreShapeSchema = v.object({
@@ -54,7 +62,7 @@ export type Item = v.InferOutput<typeof ItemSchema>;
 export type SiteUI = v.InferOutput<typeof SiteUiSchema>;
 export type Settings = v.InferOutput<typeof SettingsSchema>;
 
-const DEFAULT_SETTINGS: Settings = { theme: 'system' };
+const DEFAULT_SETTINGS: Settings = { theme: 'system', language: 'system' };
 
 export interface Site {
  id: string;

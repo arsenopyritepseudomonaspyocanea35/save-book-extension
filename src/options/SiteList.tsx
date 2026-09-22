@@ -1,4 +1,5 @@
 import { For, Show, type Component } from 'solid-js';
+import { t } from '../shared/i18n';
 import { siteName } from '../shared/naming';
 import type { Site } from '../shared/schema';
 
@@ -12,7 +13,7 @@ export interface SiteListProps {
 
 export const SiteList: Component<SiteListProps> = (props) => (
   <ul class="rail-list">
-    <Show when={props.sites.length} fallback={<li class="rail-empty">No sites yet.</li>}>
+    <Show when={props.sites.length} fallback={<li class="rail-empty">{t('sites.list.empty')}</li>}>
       <For each={props.sites}>
         {(site) => (
           <li class="rail-row" classList={{ on: site.id === props.selectedId, off: !site.enabled }}>
@@ -26,14 +27,14 @@ export const SiteList: Component<SiteListProps> = (props) => (
               <span class="count">{props.counts[site.id] ?? 0}</span>
               <span class="rail-sub">
                 <span class="rail-sub-text">
-                  {site.label ? site.pattern : site.pattern === '*' ? 'every site' : ''}
+                  {site.label ? site.pattern : site.pattern === '*' ? t('common.everySite') : ''}
                 </span>
                 <Show when={!site.enabled}>
-                  <span class="flag">card off</span>
+                  <span class="flag">{t('sites.list.cardOff')}</span>
                 </Show>
                 <Show when={site.enabled && props.noAccess[site.id]}>
-                  <span class="flag" title="Chrome access to this domain was not granted">
-                    no access
+                  <span class="flag" title={t('sites.list.noAccessTitle')}>
+                    {t('sites.list.noAccess')}
                   </span>
                 </Show>
               </span>

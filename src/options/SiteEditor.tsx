@@ -4,6 +4,7 @@ import { Field } from '../ui/field/field';
 import { PlusIcon } from '../ui/icons/icons';
 import { ItemRow } from './ItemRow';
 import { parsePattern } from '../shared/pattern';
+import { t } from '../shared/i18n';
 import { itemTypeList } from '../shared/itemTypes';
 import type { Item, ItemKind, Site } from '../shared/schema';
 
@@ -52,7 +53,7 @@ export const SiteEditor: Component<SiteEditorProps> = (props) => {
     <>
       <div class="panel">
         <div class="fields">
-          <Field label="Domain">
+          <Field label={t('site.field.domain')}>
             <div class="field-row">
               <input
                 class="input-mono"
@@ -65,20 +66,18 @@ export const SiteEditor: Component<SiteEditorProps> = (props) => {
               <Button
                 disabled={!canApply() && !props.needsAccess}
                 title={
-                  canApply()
-                    ? 'Ask Chrome for access to the new domain'
-                    : 'Ask Chrome for access to this domain'
+                  canApply() ? t('site.applyTitle') : t('site.applyTitleSame')
                 }
                 onClick={() => (canApply() ? props.onApplyPattern() : props.onGrantAccess())}
               >
-                {canApply() || !props.needsAccess ? 'Apply' : 'Grant access'}
+                {canApply() || !props.needsAccess ? t('site.apply') : t('site.grantAccess')}
               </Button>
             </div>
           </Field>
-          <Field label="Label">
+          <Field label={t('site.field.label')}>
             <input
               type="text"
-              placeholder="Optional, shown in the card"
+              placeholder={t('site.field.labelPlaceholder')}
               value={props.site.label}
               onInput={(event) => props.onLabel(event.currentTarget.value)}
             />
@@ -94,45 +93,37 @@ export const SiteEditor: Component<SiteEditorProps> = (props) => {
           <span class="track">
             <span class="knob" />
           </span>
-          <span class="switch-label">Show the card on this site</span>
+          <span class="switch-label">{t('site.showCard')}</span>
         </label>
         <p class="hint">
           {props.needsAccess
-            ? `Chrome access to ${props.site.pattern} was not granted, so no card shows there yet.`
+            ? t('site.hint.noAccess', props.site.pattern)
             : props.site.pattern === '*'
-              ? 'Applies to every site.'
-              : `Applies to ${props.site.pattern} and its subdomains.`}
+              ? t('site.hint.everySite')
+              : t('site.hint.subdomains', props.site.pattern)}
         </p>
       </div>
 
       <div class="panel">
         <div class="section-head">
-          <h2>Items on this site</h2>
+          <h2>{t('site.items.title')}</h2>
           <div class="kinds">
             <For each={itemTypeList}>
               {(definition) => (
                 <Button variant="ghost" onClick={() => props.onAddItem(definition.kind)}>
                   <PlusIcon />
-                  {definition.label}
+                  {t(definition.labelKey)}
                 </Button>
               )}
             </For>
           </div>
         </div>
-        <p class="hint section-note">
-          Items are shared: a value edited here changes on every site it is shown on. Removing one
-          here takes it off this site only.
-        </p>
+        <p class="hint section-note">{t('site.items.note')}</p>
 
         <ul class="items">
           <Show
             when={props.items.length}
-            fallback={
-              <li class="items-empty">
-                Nothing saved for this site yet. Add one below, or route an item you already keep on
-                another site from <strong>Items</strong>.
-              </li>
-            }
+            fallback={<li class="items-empty">{t('site.items.empty')}</li>}
           >
             <For each={props.items}>
               {(item) => (
@@ -151,10 +142,10 @@ export const SiteEditor: Component<SiteEditorProps> = (props) => {
 
         <div class="foot">
           <Button variant="ghost" onClick={() => props.onResetCard()}>
-            Reset card position
+            {t('site.resetCard')}
           </Button>
           <Button variant="danger" onClick={confirmDelete}>
-            {armed() ? 'Click again to delete' : 'Delete site'}
+            {armed() ? t('site.deleteArmed') : t('site.delete')}
           </Button>
         </div>
       </div>

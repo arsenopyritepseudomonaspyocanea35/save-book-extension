@@ -2,7 +2,8 @@
   "manifest_version": 3,
   "name": "Save Book",
   "version": "0.1.0",
-  "description": "Keep the logins, numbers and notes you need right next to the sites you need them on.",
+  "description": "__MSG_extDescription__",
+  "default_locale": "en",
   "minimum_chrome_version": "123",
   "permissions": ["storage", "scripting"],
   "optional_host_permissions": ["*://*/*"],
@@ -11,7 +12,7 @@
     "type": "module"
   },
   "action": {
-    "default_title": "Save Book — toggle the card on this site",
+    "default_title": "__MSG_actionTitle__",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png"
