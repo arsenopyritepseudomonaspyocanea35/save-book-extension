@@ -510,6 +510,12 @@ code {
   --icon-button-size: 28px;
 }
 
+/* The switch keeps its own width in the row's fixed column, so its track ends where the
+   segments end instead of stretching a grey strip to the column edge. */
+.item > .kind-switch {
+  justify-self: start;
+}
+
 .field-actions,
 .stamp-slot {
   display: flex;

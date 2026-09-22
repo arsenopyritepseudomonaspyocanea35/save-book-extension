@@ -27,7 +27,7 @@ type ToastKind = 'info' | 'error';
 export function App() {
   const [store, setStore] = createStore<Store>(emptyStore());
   const [loaded, setLoaded] = createSignal(false);
-  const [view, setView] = createSignal<View>('sites');
+  const [view, setView] = createSignal<View>('items');
   const [selectedSiteId, setSelectedSiteId] = createSignal<string | null>(null);
   const [selectedItemId, setSelectedItemId] = createSignal<string | null>(null);
   const [patternDraft, setPatternDraft] = createSignal('');
@@ -276,8 +276,8 @@ export function App() {
   };
 
   const tabs = createMemo<TabDefinition<View>[]>(() => [
-    { id: 'sites', label: 'Sites', count: store.sites.length },
     { id: 'items', label: 'Items', count: store.items.length },
+    { id: 'sites', label: 'Sites', count: store.sites.length },
   ]);
 
   onMount(async () => {
@@ -295,7 +295,9 @@ export function App() {
       const pattern = parsePattern(pending);
       if (!pattern) return;
       setNewPattern(pattern);
+      setView('sites');
       notify(`Press Add to give Save Book access to ${pattern}.`);
+      requestAnimationFrame(() => patternInput?.focus());
     } catch { }
   });
 
