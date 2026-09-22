@@ -19,7 +19,7 @@ export const en = {
   'tabs.items': 'Items',
   'tabs.sites': 'Sites',
   'tabs.settings': 'Settings',
-  'tabs.label': 'Settings sections',
+  'tabs.label': 'Views',
 
   'sites.addDomainLabel': 'Domain to add',
   'sites.add': 'Add',
@@ -122,6 +122,7 @@ export const en = {
   'card.empty': 'No items yet',
   'card.addItems': 'Add items',
 
+  'settings.nav': 'Settings sections',
   'settings.appearance': 'Appearance',
   'settings.language': 'Language',
   'settings.data': 'Data',

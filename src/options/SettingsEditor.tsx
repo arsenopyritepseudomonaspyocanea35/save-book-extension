@@ -1,7 +1,14 @@
-import { Show, createSignal, onCleanup, onMount, type Component } from 'solid-js';
+import {
+  Show,
+  createEffect,
+  createSignal,
+  onCleanup,
+  onMount,
+  type Component,
+} from 'solid-js';
 import { Button } from '../ui/button/button';
 import { Segmented, type SegmentedOption } from '../ui/segmented/segmented';
-import type { SettingsSection } from './SettingsList';
+import { SETTINGS_SECTIONS, settingsSectionId, type SettingsSection } from './SettingsList';
 import { LOCALE_NAMES, locale, t } from '../shared/i18n';
 import { LOCALES, type Language, type Theme } from '../shared/schema';
 
@@ -16,14 +23,28 @@ const languageOptions = (): SegmentedOption<Language>[] => [
   ...LOCALES.map((code) => ({ value: code, label: LOCALE_NAMES[code] })),
 ];
 
+const DATA_TITLE_ID = `${settingsSectionId('data')}-title`;
+
+const SCROLL_GAP = 22;
+const AT_END = 4;
+
+const scrollerOf = (node: HTMLElement): HTMLElement => {
+  for (let parent = node.parentElement; parent; parent = parent.parentElement) {
+    const { overflowY } = getComputedStyle(parent);
+    if (overflowY === 'auto' || overflowY === 'scroll') return parent;
+  }
+  return (document.scrollingElement as HTMLElement | null) ?? document.documentElement;
+};
+
 export interface SettingsEditorProps {
-  section: SettingsSection;
+  visible: boolean;
   theme: Theme;
   language: Language;
   siteCount: number;
   itemCount: number;
   onTheme: (theme: Theme) => void;
   onLanguage: (language: Language) => void;
+  onActive: (section: SettingsSection | null) => void;
   onClearSites: () => void;
   onClearItems: () => void;
   onClearEverything: () => void;
@@ -93,83 +114,130 @@ export const SettingsEditor: Component<SettingsEditorProps> = (props) => {
       ? t('settings.language.noteSystem', locale())
       : t('settings.language.noteFixed', locale());
 
+  const trackSection = () => {
+    if (!props.visible) return;
+    const first = document.getElementById(settingsSectionId(SETTINGS_SECTIONS[0]));
+    if (!first) return;
+    const scroller = scrollerOf(first);
+    const reach = scroller.scrollHeight - scroller.clientHeight;
+    if (reach <= AT_END) {
+      props.onActive(null);
+      return;
+    }
+    const last = SETTINGS_SECTIONS.at(-1);
+    if (last !== undefined && scroller.scrollTop >= reach - AT_END) {
+      props.onActive(last);
+      return;
+    }
+    const origin =
+      scroller === document.scrollingElement ? 0 : scroller.getBoundingClientRect().top;
+    const line = origin + SCROLL_GAP + AT_END;
+    let current: SettingsSection = SETTINGS_SECTIONS[0];
+    for (const section of SETTINGS_SECTIONS) {
+      const node = document.getElementById(settingsSectionId(section));
+      if (node && node.getBoundingClientRect().top <= line) current = section;
+    }
+    props.onActive(current);
+  };
+
+  onMount(() => {
+    const follow = () => trackSection();
+    document.addEventListener('scroll', follow, { capture: true, passive: true });
+    window.addEventListener('resize', follow);
+    onCleanup(() => {
+      document.removeEventListener('scroll', follow, true);
+      window.removeEventListener('resize', follow);
+    });
+  });
+
+  createEffect(() => {
+    if (!props.visible) return;
+    requestAnimationFrame(trackSection);
+  });
+
   return (
     <>
-      <Show when={props.section === 'appearance'}>
-        <div class="panel">
-          <ul class="setting-rows">
-            <li class="setting-row">
-              <span class="setting-text">
-                <span class="setting-title">{t('settings.theme.title')}</span>
-                <span class="setting-note">{themeNote()}</span>
-              </span>
-              <Segmented
-                label={t('settings.theme.group')}
-                options={themeOptions()}
-                value={props.theme}
-                onChange={(theme) => props.onTheme(theme)}
-              />
-            </li>
-          </ul>
-        </div>
-      </Show>
-
-      <Show when={props.section === 'language'}>
-        <div class="panel">
-          <ul class="setting-rows">
-            <li class="setting-row">
-              <span class="setting-text">
-                <span class="setting-title">{t('settings.language')}</span>
-                <span class="setting-note">{languageNote()}</span>
-              </span>
-              <Segmented
-                label={t('settings.language.group')}
-                options={languageOptions()}
-                value={props.language}
-                onChange={(language) => props.onLanguage(language)}
-              />
-            </li>
-          </ul>
-        </div>
-      </Show>
-
-      <Show when={props.section === 'data'}>
-        <div class="panel">
-          <div class="section-head">
-            <h2>{t('settings.data.title')}</h2>
-          </div>
-          <p class="hint section-note">{t('settings.data.note')}</p>
-
-          <ul class="setting-rows">
-            <ClearRow
-              title={t('settings.data.sites')}
-              count={props.siteCount}
-              note={t('settings.data.sitesNote')}
-              label={t('settings.data.sitesLabel')}
-              armedLabel={t('settings.data.sitesArmed')}
-              disabled={props.siteCount === 0}
-              onClear={props.onClearSites}
+      <section
+        class="panel settings-section"
+        id={settingsSectionId('appearance')}
+        aria-label={t('settings.appearance')}
+      >
+        <ul class="setting-rows">
+          <li class="setting-row">
+            <span class="setting-text">
+              <span class="setting-title">{t('settings.theme.title')}</span>
+              <span class="setting-note">{themeNote()}</span>
+            </span>
+            <Segmented
+              label={t('settings.theme.group')}
+              options={themeOptions()}
+              value={props.theme}
+              onChange={(theme) => props.onTheme(theme)}
             />
-            <ClearRow
-              title={t('settings.data.items')}
-              count={props.itemCount}
-              note={t('settings.data.itemsNote')}
-              label={t('settings.data.itemsLabel')}
-              armedLabel={t('settings.data.sitesArmed')}
-              disabled={props.itemCount === 0}
-              onClear={props.onClearItems}
+          </li>
+        </ul>
+      </section>
+
+      <section
+        class="panel settings-section"
+        id={settingsSectionId('language')}
+        aria-label={t('settings.language')}
+      >
+        <ul class="setting-rows">
+          <li class="setting-row">
+            <span class="setting-text">
+              <span class="setting-title">{t('settings.language')}</span>
+              <span class="setting-note">{languageNote()}</span>
+            </span>
+            <Segmented
+              label={t('settings.language.group')}
+              options={languageOptions()}
+              value={props.language}
+              onChange={(language) => props.onLanguage(language)}
             />
-            <ClearRow
-              title={t('settings.data.everything')}
-              note={t('settings.data.everythingNote')}
-              label={t('settings.data.everythingLabel')}
-              armedLabel={t('settings.data.everythingArmed')}
-              disabled={props.siteCount === 0 && props.itemCount === 0}
-              onClear={props.onClearEverything}
-            />
-          </ul>
+          </li>
+        </ul>
+      </section>
+
+      <section
+        class="panel settings-section"
+        id={settingsSectionId('data')}
+        aria-labelledby={DATA_TITLE_ID}
+      >
+        <div class="section-head">
+          <h2 id={DATA_TITLE_ID}>{t('settings.data.title')}</h2>
         </div>
-      </Show>
+        <p class="hint section-note">{t('settings.data.note')}</p>
+
+        <ul class="setting-rows">
+          <ClearRow
+            title={t('settings.data.sites')}
+            count={props.siteCount}
+            note={t('settings.data.sitesNote')}
+            label={t('settings.data.sitesLabel')}
+            armedLabel={t('settings.data.sitesArmed')}
+            disabled={props.siteCount === 0}
+            onClear={props.onClearSites}
+          />
+          <ClearRow
+            title={t('settings.data.items')}
+            count={props.itemCount}
+            note={t('settings.data.itemsNote')}
+            label={t('settings.data.itemsLabel')}
+            armedLabel={t('settings.data.sitesArmed')}
+            disabled={props.itemCount === 0}
+            onClear={props.onClearItems}
+          />
+          <ClearRow
+            title={t('settings.data.everything')}
+            note={t('settings.data.everythingNote')}
+            label={t('settings.data.everythingLabel')}
+            armedLabel={t('settings.data.everythingArmed')}
+            disabled={props.siteCount === 0 && props.itemCount === 0}
+            onClear={props.onClearEverything}
+          />
+        </ul>
+      </section>
     </>
   );
 };

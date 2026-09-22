@@ -67,7 +67,7 @@ site — an instrument that lives on the page, not a popup or a manager app.
 - The **on-page card** is the user's named craft reference for the settings redesign: compact 272px
   panel, grip-dotted draggable header, hairline separators, muted 11.5px labels on the left,
   monospace values aligned right, quiet hover, one accent used only for state (copied, focus).
-- Store assets on hand: icon-128 (+ SVG), promo tiles, three screenshots.
+- Store assets on hand: icon-128 (+ SVG), promo tiles, five screenshots (card, Sites light and dark, Settings dark, Items dark).
 - Visual identity outside the card is documented in `DESIGN.md` ("The Quiet Instrument"): the card's
   world extended to the settings page, with one `light-dark()` pair per colour so both surfaces read
   one sheet.
@@ -75,8 +75,11 @@ site — an instrument that lives on the page, not a popup or a manager app.
 ## Evidence on Hand
 
 - `README.md` (behaviour, install, release process), `PRIVACY.md` (storage and permission honesty).
-- `store/screenshot-1-card.jpg` shows the card on a staging sign-in page; `store/screenshot-2-options.jpg`
-  and `store/screenshot-3-options-dark.jpg` show the settings page this pass replaces.
+- `store/screenshot-1-card.jpg` shows the card on a staging sign-in page, framed at 2×;
+  `store/screenshot-2-options.jpg` and `store/screenshot-3-options-dark.jpg` show the Sites view —
+  light and dark; `store/screenshot-4-settings-dark.jpg` and `store/screenshot-5-items-dark.jpg`
+  show the Views strip's Settings and Items tabs. All five were re-shot on 2026-09-22 against the
+  build that carries the Settings tab.
 - `store/promo-marquee.svg`, `store/promo-small.svg`, `store/icon-128.svg`.
 - Demo content used across the store art is synthetic (`qa@northwind.test`, "Staging (QA)",
   "+48 600 100 200"); there are no customers, testimonials, or benchmarks and none may be invented.

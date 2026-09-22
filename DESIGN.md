@@ -441,8 +441,10 @@ canvas. Both panes scroll inside a 100vh shell rather than the page scrolling.
 Settings is the same two panes carrying a different index: its rail lists the settings sections as
 rail rows whose mono subline is the section's own reading — the theme in force, the language in
 force as its own name (`System · Polski` while it follows the browser), or `4 sites · 9
-items` — and the editor holds one panel per section, whose rows run title, note, control across
-`minmax(0, 1fr) auto`, separated by 1px hairlines rather than by gaps.
+items` — and the editor carries *every* section on one page, one panel each, whose rows run title,
+note, control across `minmax(0, 1fr) auto`, separated by 1px hairlines rather than by gaps. A rail
+row here is a jump target rather than a switch: activating one scrolls its panel up, and the row
+marked current is the panel the pane has scrolled to (see Settings navigation).
 
 Spacing rhythm is intentionally two-speed. Index lists are dense: a 1px gap between rail rows and
 between site rows, with 7px 9px of padding inside each row, so a long list reads as a ruled table.
@@ -690,6 +692,24 @@ states the consequence, not the mechanism. The control is whatever the setting i
 language's segmented control, or a danger button with the two-step arm. Both sit `justify-self: end`,
 so every row in the section shares one right edge.
 
+### Settings navigation
+
+The settings rail is a table of contents, not a switcher, and every section it names is on the page
+at once. Each panel carries `settings-<section>` as its id and `scroll-margin-top: 22px`, matching
+`.main`'s top padding, so a jump leaves the panel where it sits at rest rather than flush against the
+pane's edge. Activating a row calls `scrollIntoView({ block: 'start' })` on that panel — smooth
+normally, instant under `prefers-reduced-motion: reduce` — and changes nothing else; the rail is a
+`nav` labelled **Settings sections**, while the top tab strip is a tablist labelled **Views**, since
+the two lists are no longer the same thing.
+
+The current row is read from the scroll position rather than from the click, so it never claims a
+section the user has scrolled away from. The pane tracks the panel whose top has reached the reading
+line — its own top plus the 22px jump gap — because that is the panel a jump puts there; at the
+pane's end it marks the last section, since the final panel can be too short to ever reach the line;
+and it marks nothing at all when the three sections fit without scrolling, which is the usual case
+in a full-size window (the whole page measures ~620px inside a 754px pane at 1280×800). Under 900px
+the page itself scrolls instead of the pane, and the same three rules read against the viewport.
+
 ### Language
 
 A setting row like the theme's, whose control is the segmented control with `System` and one segment
@@ -725,7 +745,9 @@ Motion is minimal and entirely in service of state: `transform 0.16s ease` and
 `background 0.16s ease` on the chevron, the switch track and the switch knob. The one authored
 moment is the toast arriving — `toast-in 0.18s ease-out`, from `opacity: 0` and a 6px downward
 offset to rest — and nothing else in the product has a keyframe. Rows, panels and tabs appear
-instantly; there are no entrance animations on lists.
+instantly; there are no entrance animations on lists. The one scroll the product animates is a
+settings rail jump (`scrollIntoView`, `behavior: smooth`); it falls back to an instant jump under
+`prefers-reduced-motion: reduce`.
 
 ### Browser surface
 
@@ -745,11 +767,15 @@ rather than a documented rule.
 
 The store rasters keep their provenance and must not be silently regenerated:
 
-- `store/screenshot-2-options.jpg` and `store/screenshot-3-options-dark.jpg` were captured by this
-  build thread from the running extension on 2026-09-22, and show the settings page as recorded
-  here (light and dark).
-- `store/screenshot-1-card.jpg`, `store/promo-marquee-1400x560.jpg`,
-  `store/promo-small-440x280.jpg`, `store/icon-128.png` and the store SVGs pre-date this work.
+- All five `store/screenshot-*.jpg` were captured on 2026-09-22 from a build of this tree: `1-card`
+  shows the card on a staging sign-in page and is a 2× detail — a 640×400 viewport at a device pixel
+  ratio of 2, so the card is the subject rather than a corner of a wide page; `2-options` and
+  `3-options-dark` are the Sites view, light and dark; `4-settings-dark` and `5-items-dark` are the
+  Views strip's other two tabs. Each was rendered from the built bundles against a stubbed
+  `chrome.storage` (the store seeded with the synthetic Northwind content), not saved from a hand-
+  driven browser.
+- `store/promo-marquee-1400x560.jpg`, `store/promo-small-440x280.jpg`, `store/icon-128.png` and the
+  store SVGs pre-date this work.
 
 ## Do's and Don'ts
 

@@ -37,7 +37,7 @@ export const pl: Dictionary = {
   'tabs.items': 'Elementy',
   'tabs.sites': 'Witryny',
   'tabs.settings': 'Ustawienia',
-  'tabs.label': 'Sekcje ustawień',
+  'tabs.label': 'Widoki',
 
   'sites.addDomainLabel': 'Domena do dodania',
   'sites.add': 'Dodaj',
@@ -143,6 +143,7 @@ export const pl: Dictionary = {
   'card.empty': 'Brak elementów',
   'card.addItems': 'Dodaj elementy',
 
+  'settings.nav': 'Sekcje ustawień',
   'settings.appearance': 'Wygląd',
   'settings.language': 'Język',
   'settings.data': 'Dane',

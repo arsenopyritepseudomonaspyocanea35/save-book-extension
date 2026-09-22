@@ -15,7 +15,8 @@ the page. A small, draggable card shows your saved items on the sites you choose
   the system, or pin light or dark. **Language** follows your browser's own language out of the box —
   English, Polish, Spanish, French and German ship today — and can be pinned to any of them, in the
   settings page and on the card together. **Data** clears all sites, all items, or everything, and
-  hands back the Chrome access that went with those sites.
+  hands back the Chrome access that went with those sites. All three sit on one page, and the rail
+  beside them jumps to a section instead of switching to it.
 - A card shows the items of **every site that matches the page** — its own site and any broader one,
   `*` included. So an item kept on the `*` site appears everywhere the card runs, next to whatever
   that page has of its own. Chrome access is per domain, so the `*` site needs the all-sites grant;

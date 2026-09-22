@@ -26,7 +26,7 @@ export const fr: Dictionary = {
   'tabs.items': 'Éléments',
   'tabs.sites': 'Sites',
   'tabs.settings': 'Réglages',
-  'tabs.label': 'Sections des réglages',
+  'tabs.label': 'Vues',
 
   'sites.addDomainLabel': 'Domaine à ajouter',
   'sites.add': 'Ajouter',
@@ -132,6 +132,7 @@ export const fr: Dictionary = {
   'card.empty': "Aucun élément",
   'card.addItems': 'Ajouter des éléments',
 
+  'settings.nav': 'Sections des réglages',
   'settings.appearance': 'Apparence',
   'settings.language': 'Langue',
   'settings.data': 'Données',
