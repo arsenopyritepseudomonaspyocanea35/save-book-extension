@@ -7,7 +7,6 @@ export interface KindSwitchProps {
   onChange: (kind: ItemKind) => void;
 }
 
-/** Text or masked secret — one control, wherever an item's kind is shown. */
 export const KindSwitch: Component<KindSwitchProps> = (props) => (
   <div class="kind-switch" role="group" aria-label="Item kind">
     <For each={itemTypeList}>

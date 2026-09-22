@@ -9,9 +9,7 @@ import type { Item, ItemKind, Site } from '../shared/schema';
 
 export interface ItemEditorProps {
   item: Item;
-  /** Every site in the store, in store order. */
   sites: Site[];
-  /** Item count per site, so a site row can say how much it carries. */
   counts: Record<string, number>;
   onLabel: (value: string) => void;
   onValue: (value: string) => void;

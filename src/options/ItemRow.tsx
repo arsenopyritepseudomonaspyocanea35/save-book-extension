@@ -8,7 +8,6 @@ import type { Item, ItemKind, Site } from '../shared/schema';
 
 export interface ItemRowProps {
  item: Item;
- /** Every site this item is shown on, so a shared item says so in place. */
  shownOn: Site[];
  onLabel: (value: string) => void;
  onValue: (value: string) => void;
@@ -16,11 +15,6 @@ export interface ItemRowProps {
  onRemove: () => void;
 }
 
-/**
- * One row of a site's items. Every cell is its own grid column — kind, label, value, reveal,
- * stamp, remove — so the same field sits in the same place and at the same width in every row,
- * whether or not that row has a secret to reveal or a stamp to show.
- */
 export const ItemRow: Component<ItemRowProps> = (props) => {
  const definition = () => itemTypes[props.item.type];
  const [revealed, setRevealed] = createSignal(false);

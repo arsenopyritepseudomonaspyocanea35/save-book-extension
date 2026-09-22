@@ -65,10 +65,6 @@ function parseSite(raw: unknown): Site | undefined {
  return { ...parsed.output, pattern: parsePattern(parsed.output.pattern) };
 }
 
-/**
- * Reads whatever is stored: the ladder in `./migrations` walks old shapes up to the current one
- * first, then the current schema decides what is usable and what a record is missing.
- */
 export function parseStore(raw: unknown): Store {
  const shape = v.safeParse(StoreShapeSchema, applyMigrations(raw));
  if (!shape.success) return emptyStore();
@@ -85,7 +81,6 @@ export function parseStore(raw: unknown): Store {
   const parsed = v.safeParse(ItemSchema, candidate);
   if (!parsed.success) continue;
   const item = parsed.output;
-  // An item that outlived the site it was shown on would be a dangling route.
   item.sites = [...new Set(item.sites)].filter((id) => known.has(id));
   items.push(item);
  }

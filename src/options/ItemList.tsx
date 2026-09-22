@@ -6,9 +6,7 @@ import type { Item } from '../shared/schema';
 const DOTS = '••••••••';
 
 export interface ItemListProps {
-  /** Items matching the current filter. */
   items: Item[];
-  /** How many items the store holds, so a filtered-out list can say so. */
   total: number;
   selectedId: string | null;
   onSelect: (id: string) => void;

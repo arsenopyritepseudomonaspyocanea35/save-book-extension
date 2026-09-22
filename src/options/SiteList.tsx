@@ -4,7 +4,6 @@ import type { Site } from '../shared/schema';
 
 export interface SiteListProps {
   sites: Site[];
-  /** Item count per site, from the shared pool. */
   counts: Record<string, number>;
   selectedId: string | null;
   onSelect: (id: string) => void;

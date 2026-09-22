@@ -58,8 +58,6 @@ textarea {
   background-clip: content-box;
 }
 
-/* ── shell ─────────────────────────────────────────────── */
-
 .app {
   display: grid;
   grid-template-rows: var(--bar-h) minmax(0, 1fr);
@@ -124,8 +122,6 @@ textarea {
   max-width: 860px;
 }
 
-/* ── form basics ───────────────────────────────────────── */
-
 input[type='text'],
 input[type='password'],
 input[type='search'],
@@ -158,13 +154,11 @@ select:focus-visible {
   gap: 6px;
 }
 
-/* A row's controls share one height, so a button never sits 2px proud of the field beside it. */
 .add .button,
 .field-row .button {
   height: 34px;
 }
 
-/* A stored value or a host pattern is data, and reads as data on both sides of the product. */
 input.input-mono,
 .value-wrap input,
 .item > .item-value {
@@ -202,8 +196,6 @@ code {
   font-size: 11px;
 }
 
-/* ── rail ──────────────────────────────────────────────── */
-
 .rail-list {
   display: flex;
   flex-direction: column;
@@ -227,7 +219,6 @@ code {
   --rail-columns: auto minmax(0, 1fr) auto;
 }
 
-/* The whole row is one button: hovering, clicking and focusing all agree on it. */
 .rail-open {
   display: grid;
   grid-template-columns: var(--rail-columns, minmax(0, 1fr) auto);
@@ -354,8 +345,6 @@ code {
   white-space: nowrap;
 }
 
-/* ── panels ────────────────────────────────────────────── */
-
 .panel {
   padding: 16px 18px;
   background: var(--surface);
@@ -400,9 +389,6 @@ code {
   line-height: 1.5;
 }
 
-/* A panel's explanatory note sits one gap below whatever it follows: the section heading pulls it
-   in tight (the heading's own 10px margin makes 6px), and a control row gets the same 6px by
-   number, because a bordered field leaves less air than a heading's baseline does. */
 .section-note {
   margin: 0 0 12px;
   max-width: 62ch;
@@ -429,8 +415,6 @@ code {
   font-size: 13px;
   font-weight: 600;
 }
-
-/* switch */
 
 .switch {
   display: inline-flex;
@@ -485,8 +469,6 @@ code {
   font-size: 13px;
 }
 
-/* item rows (a site's items) */
-
 .items {
   display: flex;
   flex-direction: column;
@@ -509,7 +491,6 @@ code {
   font-weight: 600;
 }
 
-/* Every cell is its own column, so the same field lands in the same place in every row. */
 .item {
   display: grid;
   grid-template-columns: 128px minmax(0, 1fr) minmax(0, 1.15fr) 28px 74px 30px;
@@ -521,8 +502,6 @@ code {
   --icon-button-size: 28px;
 }
 
-/* The switch keeps its own width in the row's fixed column, so its track ends where the
-   segments end instead of stretching a grey strip to the column edge. */
 .item > .kind-switch {
   justify-self: start;
 }
@@ -585,8 +564,6 @@ code {
   font-size: 13px;
 }
 
-/* site rows (an item's sites) */
-
 .site-list {
   display: flex;
   flex-direction: column;
@@ -615,8 +592,6 @@ code {
   grid-column: 3;
   --icon-button-size: 26px;
 }
-
-/* ── kind switch ───────────────────────────────────────── */
 
 .kind-switch {
   display: inline-flex;
@@ -654,8 +629,6 @@ code {
   outline-offset: 1px;
 }
 
-/* ── toast ─────────────────────────────────────────────── */
-
 .toast {
   position: fixed;
   bottom: 20px;
@@ -684,8 +657,6 @@ code {
     transform: translate(-50%, 6px);
   }
 }
-
-/* ── narrow ────────────────────────────────────────────── */
 
 @media (max-width: 1180px) {
   :root {
@@ -718,7 +689,6 @@ code {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  /* Two columns of cells reflow onto three lines but keep one column per field. */
   .item {
     grid-template-columns: 118px minmax(0, 1fr) 28px;
     grid-template-areas:

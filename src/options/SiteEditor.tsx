@@ -9,9 +9,7 @@ import type { Item, ItemKind, Site } from '../shared/schema';
 
 export interface SiteEditorProps {
   site: Site;
-  /** Every site in the store, so a shared item can name where else it lives. */
   sites: Site[];
-  /** Items routed to this site, in pool order. */
   items: Item[];
   patternDraft: string;
   onPatternDraft: (value: string) => void;

@@ -2,7 +2,6 @@
 name: Save Book
 description: A quiet per-site instrument — one shared record read from both of its ends.
 colors:
-  # ── light ─────────────────────────────────────────────
   ground: "#f6f7f9"
   surface: "#ffffff"
   surface-float: "rgba(255, 255, 255, 0.88)"
@@ -17,7 +16,6 @@ colors:
   danger: "#d93a3a"
   raise: "#ffffff"
   scroll-thumb: "color-mix(in srgb, #14161a 16%, transparent)"
-  # ── dark ──────────────────────────────────────────────
   ground-dark: "#0f1115"
   surface-dark: "#16181d"
   surface-float-dark: "rgba(20, 22, 26, 0.88)"
