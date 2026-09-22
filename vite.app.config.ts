@@ -6,7 +6,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     emptyOutDir: false,
-    target: 'chrome120',
+    target: 'chrome123',
     modulePreload: { polyfill: false },
     rollupOptions: {
       input: {

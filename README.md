@@ -9,8 +9,11 @@ the page. A small, draggable card shows your saved items on the sites you choose
 
 - You pick the sites; each one shows a list of items — a label plus a value, or a masked secret.
 - An item is stored once and shown wherever you add it, so one staging login can live on three
-  sites without being typed three times. Settings holds two views of the same data: a site's items,
-  and an item's sites.
+  sites without being typed three times. Two of the settings page's three tabs are two views of the
+  same data — a site's items, and an item's sites; the third holds the extension's own settings.
+- **Appearance** overrides the theme for the settings page and for the card on every site — follow
+  the system, or pin light or dark. **Data** clears all sites, all items, or everything, and hands
+  back the Chrome access that went with those sites.
 - On those sites, and only those, the card appears. Click a row to copy the value.
 - Drag the card wherever suits you. Position, collapsed state and visibility are remembered per site.
 - Everything is configured in the extension's settings page. Toggle the card from the toolbar icon.

@@ -5,7 +5,7 @@ import { Card } from './Card';
 import { itemTypes } from '../shared/itemTypes';
 import type { CardToBackground, BackgroundToCard } from '../shared/messages';
 import { findSite } from '../shared/pattern';
-import type { Item, Site, SiteUI } from '../shared/schema';
+import type { Item, Site, SiteUI, Theme } from '../shared/schema';
 import { onStoreChanged, patchSite, readStore } from '../shared/store';
 declare global {
   var __savebookBoot: Promise<void> | null | undefined;
@@ -70,6 +70,7 @@ async function boot(): Promise<void> {
   const [items, setItems] = createSignal<Item[]>(
     store.items.filter((item) => item.sites.includes(initial.id)),
   );
+  const [theme, setTheme] = createSignal<Theme>(store.settings.theme);
   let dispose: (() => void) | undefined;
   let unsubscribe: (() => void) | undefined;
 
@@ -111,6 +112,7 @@ async function boot(): Promise<void> {
           <Card
             site={current()}
             items={items()}
+            theme={theme()}
             host={host}
             onPatchUi={patchUi}
             onOpenOptions={openOptions}
@@ -130,6 +132,7 @@ async function boot(): Promise<void> {
     }
     setSite(next);
     setItems(changed.items.filter((item) => item.sites.includes(next.id)));
+    setTheme(changed.settings.theme);
   });
 
   chrome.runtime.onMessage.addListener(onMessage);

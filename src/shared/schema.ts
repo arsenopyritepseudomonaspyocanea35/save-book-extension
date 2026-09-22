@@ -9,6 +9,10 @@ export const ITEM_KINDS = ['text', 'secret'] as const;
 export const ItemKindSchema = v.picklist(ITEM_KINDS);
 export type ItemKind = v.InferOutput<typeof ItemKindSchema>;
 
+export const THEMES = ['system', 'light', 'dark'] as const;
+export const ThemeSchema = v.picklist(THEMES);
+export type Theme = v.InferOutput<typeof ThemeSchema>;
+
 const ItemSchema = v.object({
  id: v.fallback(v.pipe(v.string(), v.minLength(1)), () => crypto.randomUUID()),
  type: v.fallback(ItemKindSchema, 'text'),
@@ -35,14 +39,22 @@ const SiteSchema = v.object({
  ui: v.fallback(SiteUiSchema, () => ({ ...DEFAULT_UI })),
 });
 
+const SettingsSchema = v.object({
+ theme: v.fallback(ThemeSchema, 'system'),
+});
+
 const StoreShapeSchema = v.object({
  version: v.fallback(v.number(), SCHEMA_VERSION),
  sites: v.fallback(v.array(v.unknown()), () => []),
  items: v.fallback(v.array(v.unknown()), () => []),
+ settings: v.fallback(SettingsSchema, () => ({ ...DEFAULT_SETTINGS })),
 });
 
 export type Item = v.InferOutput<typeof ItemSchema>;
 export type SiteUI = v.InferOutput<typeof SiteUiSchema>;
+export type Settings = v.InferOutput<typeof SettingsSchema>;
+
+const DEFAULT_SETTINGS: Settings = { theme: 'system' };
 
 export interface Site {
  id: string;
@@ -57,6 +69,7 @@ export interface Store {
  version: number;
  sites: Site[];
  items: Item[];
+ settings: Settings;
 }
 
 function parseSite(raw: unknown): Site | undefined {
@@ -85,11 +98,11 @@ export function parseStore(raw: unknown): Store {
   items.push(item);
  }
 
- return { version: SCHEMA_VERSION, sites, items };
+ return { version: SCHEMA_VERSION, sites, items, settings: shape.output.settings };
 }
 
 export function emptyStore(): Store {
- return { version: SCHEMA_VERSION, sites: [], items: [] };
+ return { version: SCHEMA_VERSION, sites: [], items: [], settings: { ...DEFAULT_SETTINGS } };
 }
 
 export function createItem(kind: ItemKind, sites: string[] = []): Item {

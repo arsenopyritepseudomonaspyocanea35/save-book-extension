@@ -30,7 +30,7 @@ site — an instrument that lives on the page, not a popup or a manager app.
 
 ## Operating Context
 
-- Chrome (MV3), desktop, `minimum_chrome_version` 120.
+- Chrome (MV3), desktop, `minimum_chrome_version` 123.
 - Shared/test credentials, not production secrets: items are stored unencrypted in
   `chrome.storage.local` and never leave the browser. `PRIVACY.md` states this caveat and it is
   part of the product's honesty, not a gap to paper over.
@@ -65,7 +65,9 @@ site — an instrument that lives on the page, not a popup or a manager app.
   panel, grip-dotted draggable header, hairline separators, muted 11.5px labels on the left,
   monospace values aligned right, quiet hover, one accent used only for state (copied, focus).
 - Store assets on hand: icon-128 (+ SVG), promo tiles, three screenshots.
-- Visual identity outside the card is undocumented — no DESIGN.md exists.
+- Visual identity outside the card is documented in `DESIGN.md` ("The Quiet Instrument"): the card's
+  world extended to the settings page, with one `light-dark()` pair per colour so both surfaces read
+  one sheet.
 
 ## Evidence on Hand
 

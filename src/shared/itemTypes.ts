@@ -29,6 +29,10 @@ export const itemTypes: Record<ItemKind, ItemDefinition> = {
 
 export const itemTypeList: ItemDefinition[] = Object.values(itemTypes);
 
+export const itemKindOptions: { value: ItemKind; label: string }[] = itemTypeList.map(
+  ({ kind, label }) => ({ value: kind, label }),
+);
+
 export function isItemKind(value: unknown): value is ItemKind {
   return itemTypeList.some((definition) => definition.kind === value);
 }

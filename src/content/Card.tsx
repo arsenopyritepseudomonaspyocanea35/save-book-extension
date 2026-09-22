@@ -2,7 +2,7 @@ import { For, Show, createEffect, createSignal, onCleanup, onMount, type Compone
 import { IconButton } from '../ui/icon-button/icon-button';
 import { ChevronIcon, CloseIcon, EyeIcon, EyeOffIcon, GripIcon } from '../ui/icons/icons';
 import { itemTypes } from '../shared/itemTypes';
-import type { Item, Site, SiteUI } from '../shared/schema';
+import type { Item, Site, SiteUI, Theme } from '../shared/schema';
 
 const DOTS = '••••••••';
 const GUTTER = 12;
@@ -11,6 +11,7 @@ const COPY_MS = 1000;
 export interface CardProps {
   site: Site;
   items: Item[];
+  theme: Theme;
   host: HTMLElement;
   onPatchUi: (patch: Partial<SiteUI>) => void;
   onOpenOptions: () => void;
@@ -161,6 +162,7 @@ export const Card: Component<CardProps> = (props) => {
     <div
       class="card ui-tokens"
       classList={{ collapsed: props.site.ui.collapsed }}
+      data-theme={props.theme === 'system' ? undefined : props.theme}
       on:click={(event) => event.stopPropagation()}
       on:contextmenu={(event) => event.stopPropagation()}
     >

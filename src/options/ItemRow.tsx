@@ -1,9 +1,9 @@
 import { Show, createSignal, type Component } from 'solid-js';
 import { IconButton } from '../ui/icon-button/icon-button';
+import { Segmented } from '../ui/segmented/segmented';
 import { EyeIcon, EyeOffIcon, XIcon } from '../ui/icons/icons';
-import { KindSwitch } from './KindSwitch';
 import { RouteStamp } from './RouteStamp';
-import { itemTypes } from '../shared/itemTypes';
+import { itemKindOptions, itemTypes } from '../shared/itemTypes';
 import type { Item, ItemKind, Site } from '../shared/schema';
 
 export interface ItemRowProps {
@@ -21,7 +21,12 @@ export const ItemRow: Component<ItemRowProps> = (props) => {
 
  return (
   <li class="item">
-   <KindSwitch value={props.item.type} onChange={(kind) => props.onKind(kind)} />
+   <Segmented
+    label="Item kind"
+    options={itemKindOptions}
+    value={props.item.type}
+    onChange={(kind) => props.onKind(kind)}
+   />
 
    <input
     class="item-label"

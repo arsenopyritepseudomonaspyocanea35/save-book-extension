@@ -1,9 +1,9 @@
 import { For, Show, createEffect, createSignal, onCleanup, type Component } from 'solid-js';
 import { Button } from '../ui/button/button';
 import { IconButton } from '../ui/icon-button/icon-button';
+import { Segmented } from '../ui/segmented/segmented';
 import { EyeIcon, EyeOffIcon, XIcon } from '../ui/icons/icons';
-import { KindSwitch } from './KindSwitch';
-import { itemTypes } from '../shared/itemTypes';
+import { itemKindOptions, itemTypes } from '../shared/itemTypes';
 import { siteName } from '../shared/naming';
 import type { Item, ItemKind, Site } from '../shared/schema';
 
@@ -55,7 +55,12 @@ export const ItemEditor: Component<ItemEditorProps> = (props) => {
           <div class="field">
             <span class="field-label">Kind</span>
             <span class="kind-line">
-              <KindSwitch value={props.item.type} onChange={(kind) => props.onKind(kind)} />
+              <Segmented
+                label="Item kind"
+                options={itemKindOptions}
+                value={props.item.type}
+                onChange={(kind) => props.onKind(kind)}
+              />
             </span>
           </div>
           <div class="field">

@@ -5,6 +5,8 @@ import { PlusIcon } from '../ui/icons/icons';
 import { Tabs, type TabDefinition } from '../ui/tabs/tabs';
 import { ItemEditor } from './ItemEditor';
 import { ItemList } from './ItemList';
+import { SettingsEditor } from './SettingsEditor';
+import { SettingsList, type SettingsSection } from './SettingsList';
 import { SiteEditor } from './SiteEditor';
 import { SiteList } from './SiteList';
 import { itemTypeList } from '../shared/itemTypes';
@@ -18,10 +20,11 @@ import {
   type ItemKind,
   type Site,
   type Store,
+  type Theme,
 } from '../shared/schema';
 import { readStore, writeStore } from '../shared/store';
 
-type View = 'sites' | 'items';
+type View = 'sites' | 'items' | 'settings';
 type ToastKind = 'info' | 'error';
 
 export function App() {
@@ -30,6 +33,7 @@ export function App() {
   const [view, setView] = createSignal<View>('items');
   const [selectedSiteId, setSelectedSiteId] = createSignal<string | null>(null);
   const [selectedItemId, setSelectedItemId] = createSignal<string | null>(null);
+  const [settingsSection, setSettingsSection] = createSignal<SettingsSection>('appearance');
   const [patternDraft, setPatternDraft] = createSignal('');
   const [newPattern, setNewPattern] = createSignal('');
   const [filter, setFilter] = createSignal('');
@@ -49,6 +53,12 @@ export function App() {
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => setToast(null), 4200);
   };
+
+  createEffect(() => {
+    const theme = store.settings.theme;
+    if (theme === 'system') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.dataset.theme = theme;
+  });
 
   const flushWrite = async () => {
     clearTimeout(saveTimer);
@@ -265,6 +275,53 @@ export function App() {
     notify(`${itemName(item)} deleted, on every site.`);
   };
 
+  const setTheme = (theme: Theme) => {
+    setStore('settings', 'theme', theme);
+    void persistNow();
+  };
+
+  const clearSites = async () => {
+    const count = store.sites.length;
+    if (!count) return;
+    const origins = store.sites.flatMap((site) => site.origins);
+    setStore('sites', []);
+    setStore('items', (items) => items.map((item) => ({ ...item, sites: [] })));
+    setSelectedSiteId(null);
+    await persistNow();
+    await dropOrigins(origins);
+    notify(
+      `Removed ${count} ${count === 1 ? 'site' : 'sites'}. Chrome access was handed back; every item is now in “Not on any site”.`,
+    );
+  };
+
+  const clearItems = async () => {
+    const count = store.items.length;
+    if (!count) return;
+    setStore('items', []);
+    setSelectedItemId(null);
+    await persistNow();
+    notify(
+      `Deleted ${count} ${count === 1 ? 'item' : 'items'}. Sites and card positions are untouched.`,
+    );
+  };
+
+  const clearEverything = async () => {
+    const sites = store.sites.length;
+    const items = store.items.length;
+    if (!sites && !items) return;
+    const origins = store.sites.flatMap((site) => site.origins);
+    setStore('sites', []);
+    setStore('items', []);
+    setSelectedSiteId(null);
+    setSelectedItemId(null);
+    await persistNow();
+    await dropOrigins(origins);
+    notify(
+      `Cleared ${sites} ${sites === 1 ? 'site' : 'sites'} and ${items} ${items === 1 ? 'item' : 'items'
+      }, plus every card position. Chrome access was handed back.`,
+    );
+  };
+
   const openSite = (siteId: string) => {
     setSelectedSiteId(siteId);
     setView('sites');
@@ -278,6 +335,7 @@ export function App() {
   const tabs = createMemo<TabDefinition<View>[]>(() => [
     { id: 'items', label: 'Items', count: store.items.length },
     { id: 'sites', label: 'Sites', count: store.sites.length },
+    { id: 'settings', label: 'Settings' },
   ]);
 
   onMount(async () => {
@@ -487,6 +545,39 @@ export function App() {
                   )}
                 </Show>
               </Show>
+            </div>
+          </main>
+        </div>
+
+        <div
+          class="view"
+          id="panel-settings"
+          role="tabpanel"
+          aria-labelledby="tab-settings"
+          hidden={view() !== 'settings'}
+        >
+          <aside class="side">
+            <SettingsList
+              active={settingsSection()}
+              theme={store.settings.theme}
+              siteCount={store.sites.length}
+              itemCount={store.items.length}
+              onSelect={setSettingsSection}
+            />
+          </aside>
+
+          <main class="main">
+            <div class="editor">
+              <SettingsEditor
+                section={settingsSection()}
+                theme={store.settings.theme}
+                siteCount={store.sites.length}
+                itemCount={store.items.length}
+                onTheme={setTheme}
+                onClearSites={() => void clearSites()}
+                onClearItems={() => void clearItems()}
+                onClearEverything={() => void clearEverything()}
+              />
             </div>
           </main>
         </div>

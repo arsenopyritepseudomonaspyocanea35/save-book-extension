@@ -28,7 +28,7 @@ colors:
   accent-dark: "#a5b4fc"
   accent-fg-dark: "#0e1014"
   danger-dark: "#f0736f"
-  raise-dark: "#23272f"
+  raise-dark: "#393f4c"
   scroll-thumb-dark: "color-mix(in srgb, #e9eaec 22%, transparent)"
 typography:
   headline:
@@ -213,11 +213,11 @@ components:
     typography: "{typography.data-sm}"
     rounded: "{rounded.pill}"
     padding: "1px 6px"
-  kind-switch:
+  segmented:
     backgroundColor: "{colors.hover}"
     rounded: "{rounded.md}"
     padding: "2px"
-  kind-switch-active:
+  segmented-active:
     backgroundColor: "{colors.raise}"
     textColor: "{colors.ink}"
     typography: "{typography.control-sm}"
@@ -286,9 +286,12 @@ two things that genuinely float. The single authored moment is the toast arrivin
 ### Two surfaces, one world
 
 The tokens in the shared sheet are consumed by both surfaces; neither surface defines its own
-palette. Themes are bound once through `prefers-color-scheme`, and the two surfaces bind them
-differently: the options page takes them at `:root`, while the on-page card carries a
-`ui-tokens` class inside its shadow root so the tokens exist in that document fragment too.
+palette. Each colour is one `light-dark()` pair bound to the element's `color-scheme`, so the scheme
+is declared once and both surfaces read the same values: the options page takes `color-scheme` at
+`:root`, while the on-page card carries a `ui-tokens` class inside its shadow root so the tokens
+exist in that document fragment too. With no `data-theme` attribute the pair resolves through the
+system; the Settings view's theme override pins one scheme by writing `data-theme` on `:root` and on
+the card's `ui-tokens` element, and the two surfaces follow together because they read one sheet.
 
 **Shared, consumed by both:** `--bg`, `--surface`, `--surface-float`, `--field`, `--fg`,
 `--muted`, `--line`, `--line-strong`, `--hover`, `--accent`, `--accent-fg`, `--danger`, `--raise`,
@@ -296,7 +299,7 @@ differently: the options page takes them at `:root`, while the on-page card carr
 `--font`, `--mono`, `--ring`, `--scroll-thumb`.
 
 **Owned by the settings page:** the shell metrics `--bar-h` (46px) and `--rail-w` (292px, 252px
-under 1180px), the panel/rail/tab/toast/switch/segmented-kinds primitives, `::selection`,
+under 1180px), the panel/rail/tab/toast/switch/segmented primitives, the setting row, `::selection`,
 `caret-color`, the themed scrollbars, and the whole mirror grammar described under Components.
 
 **Owned by the on-page card:** its 272px width and 44vh list cap, its translucent `--surface-float`
@@ -307,7 +310,8 @@ It lives in a shadow root and never inherits the host page's CSS.
 ## Colors
 
 A cool near-neutral ground carrying one indigo, with a single red reserved for destruction. Every
-value below is defined twice — once for the light scheme, once for dark — in one shared sheet.
+value below is defined once as a light/dark pair in one shared sheet, and the scheme it resolves to
+is the system's until the Settings view's theme override pins one.
 
 ### Primary
 
@@ -341,10 +345,12 @@ value below is defined twice — once for the light scheme, once for dark — in
   selects, neutral buttons, flag pills) and the switch track's off fill. Heavier than a hairline on
   purpose: it is a control's boundary, not a division.
 - **Hover Wash** (`rgba(16, 24, 40, 0.045)` light / `rgba(255, 255, 255, 0.06)` dark): the single
-  hover treatment, also used as the fill of count/stamp pills, code chips, and the segmented-kind
+  hover treatment, also used as the fill of count/stamp pills, code chips, and the segmented
   track.
-- **Raise** (`#ffffff` light / `#23272f` dark): the lifted segment of the segmented kind control —
-  white on a wash in light, one step above the field in dark.
+- **Raise** (`#ffffff` light / `#393f4c` dark): the lifted segment of a segmented control. In light
+  it is white on a wash; in dark it is a measured step *above* the track it sits on — the chip has to
+  clear the `--hover` wash over `--surface`, which is around `#24262b`, so the dark value is lighter
+  than the panel rather than equal to it.
 
 ### Semantic — Danger
 
@@ -363,6 +369,12 @@ element is a control the user clicks or types into. Never a 2px divider, never a
 
 **The Ground Change Rule.** Rail is `--surface`, editor is `--bg`. The two grounds plus their shared
 hairline are the layout; do not add a third ground to identify a region.
+
+**The One Sheet Rule.** Every colour is one `light-dark()` pair in the shared sheet, and a surface
+binds its scheme through `color-scheme` — never through its own palette, its own media query, or a
+hard-coded hex. The Settings view's override reaches both surfaces only because of this: it writes
+one `data-theme` attribute and every pair, in the page and in the card's shadow root, resolves
+against it.
 
 ## Typography
 
@@ -389,7 +401,7 @@ values available on variable system faces.
   switch caption, section headings (13px/600), and rail row titles (13px/550).
 - **Control** (520, 13.5px): button labels.
 - **Control Small** (520, 12.5px): the compact `+ Text` / `+ Password` rail buttons (30px tall) and
-  the segmented kind control's segments (11.5px/520 inside a 2px-padded track).
+  a segmented control's segments (11.5px/520 inside a 2px-padded track).
 - **Label** (550, 11.5px, muted): field labels — "Domain", "Label", "Kind", "Value", "Sites this
   item is on" sits at 13px/600 instead. Uppercase is never used.
 - **Hint** (400, 11.5px/1.5, muted): help text under controls, footnote lines, and the smaller
@@ -420,11 +432,16 @@ that needs less content.
 ## Layout
 
 The shell is a two-row grid: a 46px top bar over a `292px + 1fr` view. The bar holds the brand and
-the Items/Sites tab strip — Items first, and the view the page opens on — with the tab underline
-sitting on the bar's own bottom hairline. The rail
+the Items/Sites/Settings tab strip — Items first, and the view the page opens on — with the tab
+underline sitting on the bar's own bottom hairline. The rail
 sits on `--surface` with a right hairline and scrolls independently; the editor sits on `--bg` with
 padding of 22px 26px 48px and a content cap of 860px so the form never stretches into a wide empty
 canvas. Both panes scroll inside a 100vh shell rather than the page scrolling.
+
+Settings is the same two panes carrying a different index: its rail lists the settings sections as
+rail rows whose mono subline is the section's own reading — the theme in force, or `4 sites · 9
+items` — and the editor holds one panel per section, whose rows run title, note, control across
+`minmax(0, 1fr) auto`, separated by 1px hairlines rather than by gaps.
 
 Spacing rhythm is intentionally two-speed. Index lists are dense: a 1px gap between rail rows and
 between site rows, with 7px 9px of padding inside each row, so a long list reads as a ruled table.
@@ -440,7 +457,8 @@ becomes a block capped at 48vh with a bottom hairline instead of a right one, th
 An item row also reflows, from six columns onto three named lines over
 `118px minmax(0, 1fr) 28px` with a 6px row gap: `'kind label label' / 'value value reveal' /
 'stamp stamp remove'`. The fields change rows but never lose their own column, so the narrow layout
-is a rewrap of the same grid rather than a different structure.
+is a rewrap of the same grid rather than a different structure. A setting row reflows the same way:
+its control column folds under the label with an 8px gap and aligns left.
 
 ### Named Rules
 
@@ -464,7 +482,7 @@ shadows on panels or rows: panel outlines are a single hairline, and the differe
 and the editor is a *ground* change (`--surface` against `--bg`). Selection is shown with a wash, not
 a lifted card. Exactly one shadow token — the float shadow — is spent, on the two things that are
 genuinely floating above the page: the on-page card and the toast. Two micro-lifts exist and are not
-the float shadow: the active segment of the segmented kind control and the switch knob, each a 1px
+the float shadow: the active segment of a segmented control and the switch knob, each a 1px
 soft drop that separates them from the track they sit on.
 
 ### Shadow Vocabulary
@@ -472,7 +490,9 @@ soft drop that separates them from the track they sit on.
 - **Float** (`0 1px 2px rgba(16, 24, 40, 0.06), 0 10px 30px -8px rgba(16, 24, 40, 0.28)`; dark
   `0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 30px -8px rgba(0, 0, 0, 0.6)`): the card resting on top of
   a host page, and the toast resting on top of settings. The only shadow in the vocabulary.
-- **Segment** (`0 1px 2px rgba(16, 24, 40, 0.1)`): the selected segment of the kind control.
+- **Segment** (`0 1px 2px rgba(16, 24, 40, 0.1)` light; `0 1px 2px rgba(0, 0, 0, 0.4)` dark): the
+  selected segment of a segmented control. The lift is a fill step first and this seam second, so
+  the dark value is the one that reads on a dark track.
 - **Knob** (`0 1px 2px rgba(0, 0, 0, 0.25)`): the switch knob, which stays white in both schemes.
 
 The on-page card additionally uses `backdrop-filter: blur(20px) saturate(180%)` over its translucent
@@ -534,7 +554,9 @@ rather than an action.
 
 - **Count pill:** the `n` of items on a site, or sites on an item. `--hover` fill, mono 500 at 11px
   with tabular figures, `min-width: 20px` (18px inside a tab) and centred so the number never moves
-  its neighbours. Present on every rail row on both tabs and on every site row.
+  its neighbours. Present on every rail row on both tabs, on every site row, and on a setting row
+  that acts on one kind of record — the Everything row is the union of the two above it and carries
+  no pill.
 - **Route stamp:** the `n sites` badge on an item row, saying out loud that one value stands on
   several hosts. Same pill treatment as a count, plus a `title` naming the sites. The pill itself
   renders only when the count exceeds one, but the `.stamp-slot` that holds it is always rendered,
@@ -587,11 +609,12 @@ rather than an action.
 - **Top bar:** `--surface`, 1px bottom hairline, 46px tall, `0 16px` padding, 20px gap. It holds the
   brand (a 16px accent-coloured SVG mark, the only place the accent is used as a colour block, plus
   a 14px/600 wordmark) and the tab strip.
-- **Tabs:** a `role="tablist"` sitting on the bar's baseline, reading **Items then Sites**. Items is
-  the default view: the page opens on the shared pool, because that is where a value is entered once
-  and routed. The one thing that moves a user to Sites is the card's pending-domain path, which
-  switches the view and focuses the domain field for the `Add` the card just asked them to press.
-  Each tab is `--muted` at 13px/520 with `0 12px` padding, and carries its own count pill. Selection
+- **Tabs:** a `role="tablist"` sitting on the bar's baseline, reading **Items, Sites, then
+  Settings**. Items is the default view: the page opens on the shared pool, because that is where a
+  value is entered once and routed. The one thing that moves a user to Sites is the card's
+  pending-domain path, which switches the view and focuses the domain field for the `Add` the card
+  just asked them to press. Each tab is `--muted` at 13px/520 with `0 12px` padding, and carries its
+  own count pill; Settings carries none, because it counts nothing. Selection
   is announced three ways: `--fg` text, `aria-selected`, and a 2px `--accent` underline inset 8px
   from each side and dropped 1px so it sits *on* the bar's hairline rather than above it. Hover only
   shifts the text to `--fg`. Focus is a 2px accent outline inset 3px. Arrow keys move selection and
@@ -615,7 +638,7 @@ literal: an item's site rows reuse the rail's own title class rather than a copy
 
 - **A site's items (Sites tab panel):** a list of `.item` rows, each a single line built as a
   six-column grid — `128px minmax(0, 1fr) minmax(0, 1.15fr) 28px 74px 30px` at `gap: 8px` — holding,
-  in order, the `.kind-switch` (start-aligned, so its track ends at the Password segment rather
+  in order, the `.segmented` (start-aligned, so its track ends at the Password segment rather
   than stretching across the 128px column), the `.item-label` input, the mono `.item-value` input, a
   `.field-actions` slot, a `.stamp-slot`, and the remove icon button (28px, `justify-self: end`).
   Two of those columns are slots rather than content: `.field-actions` carries the reveal eye only
@@ -637,19 +660,32 @@ literal: an item's site rows reuse the rail's own title class rather than a copy
   same value onto that site's card, into its item list, and increments the rail count and every
   `n sites` stamp — one record, two ends, live.
 
-### Segmented kind switch
+### Segmented control
 
-The item kind (Text / Password) is one control wherever a kind is shown: a `role="group"` of two
-buttons on a 2px-padded `--hover` wash with an 8px radius. The active button is a `--raise` chip
-with a 6px radius, `--fg` text and a 1px soft lift; the inactive one is plain `--muted` text that
-goes `--fg` on hover. Focus is a 2px accent outline offset by 1px. It is a segmented control, not a
-toggle: both options are always visible, and each button is `aria-pressed`.
+One control, two payloads: the item kind (Text / Password) wherever a kind is shown, and the theme
+(System / Light / Dark) in Settings. A `role="group"` of buttons on a 2px-padded `--hover` wash with
+an 8px radius. The active button is a `--raise` chip with a 6px radius, `--fg` text and a 1px soft
+lift; the inactive one is plain `--muted` text that goes `--fg` on hover. Focus is a 2px accent
+outline offset by 1px. It is a segmented control, not a toggle: every option is always visible, each
+button is `aria-pressed`, and the group takes its `aria-label` from the field it sets — "Item kind",
+"Theme".
 
-The switch owns its width, not its column. Inside an item row it sits in a fixed 128px kind column
+The control owns its width, not its column. Inside an item row it sits in a fixed 128px kind column
 but is `justify-self: start`, so the `--hover` track ends where the Password segment ends instead of
 running on as a bare grey strip to the column edge; the row's copy and the editor's copy therefore
 measure the same 119px, the 2px between the last segment and the track's edge being the control's own
 padding. A fixed column fixes where a control starts, not how wide it stretches.
+
+### Setting rows
+
+The Settings view's one list primitive, and the shape both of its sections wear: a
+`ul.setting-rows` of `li.setting-row`s inside a panel, each row a `minmax(0, 1fr) auto` grid holding
+the label block in the first column and the control in the second, `12px 0` of padding, and a
+`1px --line` rule on every row after the first. The label block stacks a 13px/550 title — carrying a
+count pill when the row acts on a number of records — over an 11.5px muted note capped at 48ch that
+states the consequence, not the mechanism. The control is whatever the setting is: the theme's
+segmented control, or a danger button with the two-step arm. Both sit `justify-self: end`, so every
+row in the section shares one right edge.
 
 ### Toggle switch
 
@@ -675,6 +711,7 @@ are thin (`scrollbar-width: thin`) with a 10px webkit track, a transparent track
 `--scroll-thumb` thumb — 16% ink in light, 22% in dark — inset 3px inside its own pill via
 `background-clip: content-box`, darkening to 30% ink on hover. The scrollbar rules are global to the
 settings page and are not shipped into the card's shadow root, where the browser keeps its own.
+Every one of them resolves from the same light/dark pairs, so the override carries them with it.
 The fourth surface is deliberately *not* themed: the Items rail's filter is `input[type='search']`,
 and its clear affordance is the browser's own control rendered inside a themed field. No
 `::-webkit-search-cancel-button` rule exists in the build, and adding one would be a new decision
@@ -710,7 +747,9 @@ The store rasters keep their provenance and must not be silently regenerated:
 - **Do** cap prose at 62ch (sections) and 48ch (panel footers), and cap editor content at 860px.
 - **Do** keep body text at 13px, labels at 11.5px/550, and never exceed 19px.
 - **Do** give destructive controls the red token plus the two-step arm (the label becomes
-  "Click again to delete", reverting after 4s) and put them alone in the panel footer's right slot.
+  "Click again to delete" — "Click again to clear" in Settings — reverting after 4s) and give them a
+  slot of their own: a panel footer's right end, or a setting row's control column, never beside a
+  neutral action of equal weight.
 
 ### Don't:
 
