@@ -73,3 +73,45 @@ export const XIcon: Component = () => (
     />
   </svg>
 );
+
+export const TextIcon: Component = () => (
+  <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.4">
+      <path d="M3 5.5h10" />
+      <path d="M3 9.5h6.5" />
+    </g>
+  </svg>
+);
+
+export const LockIcon: Component = () => (
+  <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+    <path
+      d="M5.2 7V5.7a2.8 2.8 0 0 1 5.6 0V7"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.3"
+    />
+    <rect
+      x="3.4"
+      y="7"
+      width="9.2"
+      height="6.2"
+      rx="1.6"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.3"
+    />
+  </svg>
+);
+
+export const PlusIcon: Component = () => (
+  <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+    <path
+      d="M8 3.5v9M3.5 8h9"
+      fill="none"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-width="1.5"
+    />
+  </svg>
+);

@@ -1,37 +1,45 @@
 import { For, Show, type Component } from 'solid-js';
+import { siteName } from '../shared/naming';
 import type { Site } from '../shared/schema';
 
 export interface SiteListProps {
   sites: Site[];
+  counts: Record<string, number>;
+  noAccess: Record<string, boolean>;
   selectedId: string | null;
   onSelect: (id: string) => void;
 }
 
 export const SiteList: Component<SiteListProps> = (props) => (
-  <ul class="sites">
-    <Show when={props.sites.length} fallback={<li class="empty">No sites yet</li>}>
+  <ul class="rail-list">
+    <Show when={props.sites.length} fallback={<li class="rail-empty">No sites yet.</li>}>
       <For each={props.sites}>
-        {(site) => {
-          const count = () => `${site.items.length} item${site.items.length === 1 ? '' : 's'}`;
-          const select = () => props.onSelect(site.id);
-          return (
-            <li
-              class="site"
-              classList={{ on: site.id === props.selectedId, off: !site.enabled }}
-              tabindex="0"
-              onClick={select}
-              onKeyDown={(event) => {
-                if (event.key !== 'Enter' && event.key !== ' ') return;
-                event.preventDefault();
-                select();
-              }}
+        {(site) => (
+          <li class="rail-row" classList={{ on: site.id === props.selectedId, off: !site.enabled }}>
+            <button
+              class="rail-open"
+              type="button"
+              aria-current={site.id === props.selectedId ? 'true' : undefined}
+              onClick={() => props.onSelect(site.id)}
             >
-              <span class="site-title">{site.label || site.pattern}</span>
-              <span class="site-sub">{site.label ? `${site.pattern} · ${count()}` : count()}</span>
-              <span class="site-count">{site.items.length}</span>
-            </li>
-          );
-        }}
+              <span class="rail-title">{siteName(site)}</span>
+              <span class="count">{props.counts[site.id] ?? 0}</span>
+              <span class="rail-sub">
+                <span class="rail-sub-text">
+                  {site.label ? site.pattern : site.pattern === '*' ? 'every site' : ''}
+                </span>
+                <Show when={!site.enabled}>
+                  <span class="flag">card off</span>
+                </Show>
+                <Show when={site.enabled && props.noAccess[site.id]}>
+                  <span class="flag" title="Chrome access to this domain was not granted">
+                    no access
+                  </span>
+                </Show>
+              </span>
+            </button>
+          </li>
+        )}
       </For>
     </Show>
   </ul>

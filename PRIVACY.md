@@ -13,7 +13,8 @@ Save Book stores only what you enter yourself in its settings page:
 - the site patterns (domains) you add;
 - the items you create for each site — the label, the value (for example a login, a code or a phone
   number), and whether the value is masked;
-- each card's state: its position on screen, whether it is collapsed, and whether it is hidden.
+- each card's state: its position on screen, whether it is collapsed, and whether it is hidden;
+- your theme choice — System, Light or Dark.
 
 Nothing else is collected. Save Book does not read the pages you visit, does not build a history of
 your browsing, and does not use analytics, cookies or tracking of any kind.
@@ -51,7 +52,8 @@ profile can read them, so Save Book is best used for test and shared accounts ra
 production credentials.
 
 Your data stays for as long as you keep it. You can delete any item or any site in the settings page,
-and uninstalling the extension removes all of its stored data from your browser.
+or clear every site, every item or everything at once there; uninstalling the extension removes all
+of its stored data from your browser.
 
 ## Limited Use
 

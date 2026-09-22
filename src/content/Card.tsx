@@ -2,7 +2,7 @@ import { For, Show, createEffect, createSignal, onCleanup, onMount, type Compone
 import { IconButton } from '../ui/icon-button/icon-button';
 import { ChevronIcon, CloseIcon, EyeIcon, EyeOffIcon, GripIcon } from '../ui/icons/icons';
 import { itemTypes } from '../shared/itemTypes';
-import type { Item, Site, SiteUI } from '../shared/schema';
+import type { Item, Site, SiteUI, Theme } from '../shared/schema';
 
 const DOTS = '••••••••';
 const GUTTER = 12;
@@ -10,6 +10,8 @@ const COPY_MS = 1000;
 
 export interface CardProps {
   site: Site;
+  items: Item[];
+  theme: Theme;
   host: HTMLElement;
   onPatchUi: (patch: Partial<SiteUI>) => void;
   onOpenOptions: () => void;
@@ -55,6 +57,7 @@ const Row: Component<{ item: Item; copy: (item: Item) => Promise<boolean> }> = (
         <Show when={definition().secret}>
           <IconButton
             title={revealed() ? 'Hide' : 'Reveal'}
+            pressed={revealed()}
             onClick={(event) => {
               event.stopPropagation();
               setRevealed((value) => !value);
@@ -159,6 +162,7 @@ export const Card: Component<CardProps> = (props) => {
     <div
       class="card ui-tokens"
       classList={{ collapsed: props.site.ui.collapsed }}
+      data-theme={props.theme === 'system' ? undefined : props.theme}
       on:click={(event) => event.stopPropagation()}
       on:contextmenu={(event) => event.stopPropagation()}
     >
@@ -179,7 +183,7 @@ export const Card: Component<CardProps> = (props) => {
       <div class="sep" />
       <ul class="items">
         <Show
-          when={props.site.items.length}
+          when={props.items.length}
           fallback={
             <li class="empty">
               <span>No items yet</span>
@@ -189,7 +193,7 @@ export const Card: Component<CardProps> = (props) => {
             </li>
           }
         >
-          <For each={props.site.items}>{(item) => <Row item={item} copy={props.copy} />}</For>
+          <For each={props.items}>{(item) => <Row item={item} copy={props.copy} />}</For>
         </Show>
       </ul>
     </div>

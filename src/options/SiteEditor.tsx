@@ -1,16 +1,21 @@
 import { For, Show, createSignal, onCleanup, type Component } from 'solid-js';
 import { Button } from '../ui/button/button';
 import { Field } from '../ui/field/field';
+import { PlusIcon } from '../ui/icons/icons';
 import { ItemRow } from './ItemRow';
 import { parsePattern } from '../shared/pattern';
 import { itemTypeList } from '../shared/itemTypes';
-import type { ItemKind, Site } from '../shared/schema';
+import type { Item, ItemKind, Site } from '../shared/schema';
 
 export interface SiteEditorProps {
   site: Site;
+  sites: Site[];
+  items: Item[];
   patternDraft: string;
   onPatternDraft: (value: string) => void;
   onApplyPattern: () => void;
+  needsAccess: boolean;
+  onGrantAccess: () => void;
   onLabel: (value: string) => void;
   onEnabled: (enabled: boolean) => void;
   onAddItem: (kind: ItemKind) => void;
@@ -50,6 +55,7 @@ export const SiteEditor: Component<SiteEditorProps> = (props) => {
           <Field label="Domain">
             <div class="field-row">
               <input
+                class="input-mono"
                 type="text"
                 spellcheck={false}
                 autocomplete="off"
@@ -57,11 +63,15 @@ export const SiteEditor: Component<SiteEditorProps> = (props) => {
                 onInput={(event) => props.onPatternDraft(event.currentTarget.value)}
               />
               <Button
-                disabled={!canApply()}
-                title="Ask Chrome for access to the new domain"
-                onClick={() => props.onApplyPattern()}
+                disabled={!canApply() && !props.needsAccess}
+                title={
+                  canApply()
+                    ? 'Ask Chrome for access to the new domain'
+                    : 'Ask Chrome for access to this domain'
+                }
+                onClick={() => (canApply() ? props.onApplyPattern() : props.onGrantAccess())}
               >
-                Apply
+                {canApply() || !props.needsAccess ? 'Apply' : 'Grant access'}
               </Button>
             </div>
           </Field>
@@ -87,35 +97,48 @@ export const SiteEditor: Component<SiteEditorProps> = (props) => {
           <span class="switch-label">Show the card on this site</span>
         </label>
         <p class="hint">
-          {props.site.pattern === '*'
-            ? 'Applies to every site.'
-            : `Applies to ${props.site.pattern} and its subdomains.`}
+          {props.needsAccess
+            ? `Chrome access to ${props.site.pattern} was not granted, so no card shows there yet.`
+            : props.site.pattern === '*'
+              ? 'Applies to every site.'
+              : `Applies to ${props.site.pattern} and its subdomains.`}
         </p>
       </div>
 
       <div class="panel">
         <div class="section-head">
-          <h2>Items</h2>
+          <h2>Items on this site</h2>
           <div class="kinds">
             <For each={itemTypeList}>
               {(definition) => (
                 <Button variant="ghost" onClick={() => props.onAddItem(definition.kind)}>
-                  + {definition.label}
+                  <PlusIcon />
+                  {definition.label}
                 </Button>
               )}
             </For>
           </div>
         </div>
+        <p class="hint section-note">
+          Items are shared: a value edited here changes on every site it is shown on. Removing one
+          here takes it off this site only.
+        </p>
 
         <ul class="items">
           <Show
-            when={props.site.items.length}
-            fallback={<li class="empty">No items yet — add the first one.</li>}
+            when={props.items.length}
+            fallback={
+              <li class="items-empty">
+                Nothing saved for this site yet. Add one below, or route an item you already keep on
+                another site from <strong>Items</strong>.
+              </li>
+            }
           >
-            <For each={props.site.items}>
+            <For each={props.items}>
               {(item) => (
                 <ItemRow
                   item={item}
+                  shownOn={props.sites.filter((site) => item.sites.includes(site.id))}
                   onLabel={(value) => props.onItemLabel(item.id, value)}
                   onValue={(value) => props.onItemValue(item.id, value)}
                   onKind={(kind) => props.onItemKind(item.id, kind)}

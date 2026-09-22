@@ -6,7 +6,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     emptyOutDir: true,
-    target: 'chrome120',
+    target: 'chrome123',
     lib: {
       entry: 'src/content/index.tsx',
       name: 'SaveBookCard',
