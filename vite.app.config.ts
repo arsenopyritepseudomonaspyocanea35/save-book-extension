@@ -8,7 +8,7 @@ export default defineConfig({
     emptyOutDir: false,
     target: 'chrome123',
     modulePreload: { polyfill: false },
-    rollupOptions: {
+    rolldownOptions: {
       input: {
         background: 'src/background/index.ts',
         options: 'index.html',
